@@ -1,0 +1,280 @@
+.header {
+  background-color: #333;
+  padding: 10px 20px;
+  border-radius: 15px 15px 0 0;
+  height: auto;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  align-items: center;
+
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+.logo img {
+  height: 20px;
+}
+
+.menu ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.menu ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.action .login-btn,
+.action .signup-btn {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.action .signup-btn {
+  background-color: #007bff;
+}
+
+.table-container {
+  height: calc(100vh - 120px);
+  width: 100%;
+  box-sizing: border-box; 
+}
+.upload{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.upload-btn {
+  background-color: #e5322d;
+  color: white;
+  width: 250px;  /* Fixed width */
+  height: 55px;  /* Fixed height */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.upload-btn:hover {
+  background-color: #e5322d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.upload-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.table-container input[type="file"] {
+  margin-bottom: 20px;
+}
+
+.footer {
+  background-color: #333;
+  padding: 10px 20px;
+  border-radius: 0 0 15px 15px;
+  height: 60px;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  box-sizing: border-box; 
+}
+
+.footer-copy {
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; 
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 0 10px;
+  }
+  .footer-copy {
+    padding: 0 10px;
+  }
+  h1 {
+    font-size: 2rem;
+    margin: 15px 0;
+  }
+
+}
+
+@media (max-width: 480px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+  }
+  .footer-copy {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+  }
+  .content{
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px; 
+  }
+  .upload-btn {
+    width: 150px;
+    height: 40px;
+    font-size: 14px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+
+  
+}
+
+.content{
+  display: flex;
+  padding: 15px 0 5px 5px;
+  height: calc(100vh - 120px);
+  width: 100%;
+  box-sizing: border-box; 
+}
+
+.send-message {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-right: none;
+  border-radius: 0 0 15px 15px;
+}
+
+.show-table{
+  overflow-y: auto; 
+  display: block;
+
+}
+
+tbody {
+ background-color: #f5f5fa;
+
+}
+
+
+.show-table::-webkit-scrollbar {
+  display: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  
+}
+
+table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 20px 0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.send-head{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
+  height: 80px;
+}
+
+.send-message .send-footer {
+  color: white;
+  padding: 10px 20px;
+  border-radius: 0 0 15px 15px;
+  height: 60px;
+  width: 100%;
+  position: absolute;
+  bottom: 5%;
+  left: 0;
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #e5322d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.icon-circle svg {
+  color: white;
+  font-size: 20px;
+}
+
+.icon-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(229, 50, 45, 0.3);
+}
