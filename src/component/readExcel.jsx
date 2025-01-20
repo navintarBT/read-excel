@@ -11,9 +11,9 @@ const ReadExcel = () => {
   const fileInputRef = useRef(null);
   const [showUpload, setShowUpload] = useState(true);
   const [showSendMessage, setShowSendMessage] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (file) => {
     const reader = new FileReader();
     setShowUpload(false);
     setShowSendMessage(true);
@@ -26,7 +26,7 @@ const ReadExcel = () => {
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
       const [headerRow, ...dataRows] = jsonData;
       const propertyNames = [
-        "number", "billNumber", "cod", "keepCode",
+        "number", "billNumber", "cod", "Cod",
         "service", "productName", "receiverName",
         "receiverNumber", "location", "sendDate",
         "sendDateSuccess"
@@ -59,12 +59,52 @@ const ReadExcel = () => {
     }
   };
 
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    handleFileUpload(file);
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  const handleDragEnter = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+  console.log(isDragging);
+
   return (
     <div>
       <Header />
-      <div className="table-container">
-        {showUpload && <UploadSection onClick={handleButtonClick} fileInputRef={fileInputRef} onFileUpload={handleFileUpload} />}
-        {showSendMessage && <SendMessageSection headers={headers} data={data} onClick={handleButtonClick} fileInputRef={fileInputRef} onFileUpload={handleFileUpload} />}
+      <div className={`table-container ${isDragging ? 'dragging' : ''}`}
+       onDrop={handleDrop}
+       onDragOver={handleDragOver}
+       onDragEnter={handleDragEnter}
+       onDragLeave={handleDragLeave}
+      >
+        {isDragging && <div className="drag-text">Please drop file Excel</div>}
+        {showUpload && (
+          <UploadSection
+            onClick={handleButtonClick}
+            fileInputRef={fileInputRef}
+            onFileUpload={(e) => handleFileUpload(e.target.files[0])}
+          />
+        )}
+        {showSendMessage && (
+          <SendMessageSection
+            headers={headers}
+            data={data}
+            onClick={handleButtonClick}
+            fileInputRef={fileInputRef}
+            onFileUpload={(e) => handleFileUpload(e.target.files[0])}
+          />
+        )}
       </div>
       <Footer />
     </div>
@@ -75,7 +115,7 @@ const Header = () => (
   <header className="header">
     <nav>
       <div className="logo">
-        <img src="path/to/logo.png" alt="Logo" />
+        <img src="./" alt="Logo" />
       </div>
       <div className="menu">
         <ul>
@@ -93,13 +133,16 @@ const Header = () => (
   </header>
 );
 
-const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
-  <div className='upload'>
+const UploadSection = ({ onClick, fileInputRef, onFileUpload,}) => (
+  <div
+    className= 'upload '
+  >
     <h1>Send Message</h1>
     <h2>Please select a file to send a message to the customer</h2>
     <button className="upload-btn" onClick={onClick}>
-      Upload <FontAwesomeIcon icon={faUpload} />
+    Select Excel Files <br /> ( .xls, .xlsx )<FontAwesomeIcon icon={faUpload} />
     </button>
+    <h4>drop Excel file here</h4>
     <input
       type="file"
       accept=".xlsx, .xls"
@@ -112,7 +155,7 @@ const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
 
 const SendMessageSection = ({ headers, data, onClick, fileInputRef, onFileUpload }) => (
   <div className="content">
-    <div className='show-table'>
+    <div className="show-table">
       <table>
         <thead>
           <tr>
@@ -132,11 +175,11 @@ const SendMessageSection = ({ headers, data, onClick, fileInputRef, onFileUpload
         </tbody>
       </table>
     </div>
-    <div className='send-message'>
-      <div className='send-head'>
+    <div className="send-message">
+      <div className="send-head">
         <h1>Send Message</h1>
       </div>
-      <div className='send-body'>
+      <div className="send-body">
         <div className="icon-circle" onClick={onClick}>
           <FontAwesomeIcon icon={faPlus} />
         </div>
@@ -148,8 +191,8 @@ const SendMessageSection = ({ headers, data, onClick, fileInputRef, onFileUpload
           onChange={onFileUpload}
         />
       </div>
-      <div className='send-footer'>
-        <button className='upload-btn'>
+      <div className="send-footer">
+        <button className="send-btn">
           Send Message <FontAwesomeIcon icon={faPaperPlane} />
         </button>
       </div>
@@ -159,9 +202,7 @@ const SendMessageSection = ({ headers, data, onClick, fileInputRef, onFileUpload
 
 const Footer = () => (
   <div className="footer">
-    <div className='footer-copy'>
-      Send message by using API send message
-    </div>
+    <div className="footer-copy">Send message by using API send message</div>
   </div>
 );
 
