@@ -20,8 +20,22 @@ const ReadExcel = () => {
   const [messageToEdit, setMessageToEdit] = useState(null);
   const [templateToEdit, setTemplateToEdit] = useState(null);
   const [showContent, setShowContent] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
+  const [invalidPhoneNumbers, setInvalidPhoneNumbers] = useState([]);
+  const [indexColumn, setIndexColumn] = useState(null);
 
   const handleFileUpload = (file) => {
+    const validExtensions = ['xlsx', 'xls', 'csv'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+  if (!validExtensions.includes(fileExtension)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid File Type',
+      text: 'Please upload a valid Excel file.',
+    });
+    return;
+  }
     const reader = new FileReader();
     setShowUpload(false);
     setShowCreateMessage(false);
@@ -30,6 +44,8 @@ const ReadExcel = () => {
     setShowCreateTemplate(false);
     setShowListMessage(false);
     setShowListTemplate(false);
+    setIndexColumn(null)
+    setInvalidPhoneNumbers([]);
   
     reader.onload = (e) => {
       const binaryStr = e.target.result;
@@ -39,7 +55,6 @@ const ReadExcel = () => {
       const worksheet = workbook.Sheets[firstSheetName];
   
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-      console.log('Raw Data:', jsonData);
       let headerRowIndex = -1;
       for (let i = 0; i < jsonData.length; i++) {
         const row = jsonData[i];
@@ -50,7 +65,6 @@ const ReadExcel = () => {
       }
   
       if (headerRowIndex === -1) {
-        console.error('ไม่พบแถวที่มีข้อมูลสำหรับใช้เป็น header');
         return;
       }
   
@@ -75,11 +89,9 @@ const ReadExcel = () => {
   
       setData(formattedData);
     };
-  
     reader.readAsBinaryString(file);
   };
   
-
   const handleButtonClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -159,6 +171,10 @@ const ReadExcel = () => {
     setShowListMessage(false);
   };
 
+  const spinnerComponent = (status) => {
+    setShowSpinner(status)
+  };
+
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
@@ -186,37 +202,63 @@ const ReadExcel = () => {
     setTemplateToEdit(null);
   };
 
-  const checkPhoneInvalid = (id) => {
-    console.log(id);
+  const checkPhoneInvalid = async (ids,indexColumn) => {
+    let getId = [];
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-    var urlencoded = new URLSearchParams();
-    urlencoded.append("token","kevozeqh6t0p78qs");
-    urlencoded.append("page","1");
-    urlencoded.append("limit","10");
-    urlencoded.append("status","all");
-    urlencoded.append("sort","desc");
-    urlencoded.append("id",53);
-    urlencoded.append("referenceId","");
-    urlencoded.append("from","");
-    urlencoded.append("to","");
-    urlencoded.append("ack","");
-    urlencoded.append("msgId","");
-    urlencoded.append("start_date","");
-    urlencoded.append("end_date","");
-    var requestOptions = {
-      method: 'GET',
-      headers: myHeaders, 
-      redirect: 'follow'
-    };
-    fetch("https://api.ultramsg.com/instance96828/messages?" + urlencoded, requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
+    const fetchPromises = ids.map((id) => {
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("token", "kevozeqh6t0p78qs");
+      urlencoded.append("page", "1");
+      urlencoded.append("limit", "10");
+      urlencoded.append("status", "all");
+      urlencoded.append("sort", "desc");
+      urlencoded.append("id", id);
+      urlencoded.append("referenceId", "");
+      urlencoded.append("from", "");
+      urlencoded.append("to", "");
+      urlencoded.append("ack", "");
+      urlencoded.append("msgId", "");
+      urlencoded.append("start_date", "");
+      urlencoded.append("end_date", "");
+  
+      var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+  
+      return fetch("https://api.ultramsg.com/instance96828/messages?" + urlencoded, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result)
+          if(result.messages[0].status == "invalid"){
+            const phoneNumber = result.messages[0].to.replace("85620", "").replace("@c.us", "");
+            getId.push(phoneNumber)
+          }
+          })
+        .catch(error => console.log('error', error));
+    });
+  
+    Promise.all(fetchPromises)
+      .then(() => {
+        setInvalidPhoneNumbers(getId);
+        setIndexColumn(indexColumn);
+      })
+      .catch(error => {
+        console.log('Error in one of the requests', error);
+      });
   };
 
   return (
     <div>
+      {showSpinner && 
+      <div className="spinner-overlay">
+      <div className="spinner d-flex flex-column align-items-center">
+        <div className="spinner-border" role="status"></div>
+        <span className="loading">Loading...</span>
+      </div>
+    </div>}
       <Header />
       <div
         className={`table-container ${isDragging ? 'dragging' : ''}`}
@@ -229,7 +271,7 @@ const ReadExcel = () => {
         {showUpload && (
           <UploadSection
             onClick={handleButtonClick}
-            fileInputRef={fileInputRef}
+            fileInputRef={fileInputRef}y
             onFileUpload={(e) => handleFileUpload(e.target.files[0])}
           />
         )}
@@ -244,14 +286,22 @@ const ReadExcel = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((row, index) => (
-                <tr key={index}>
+            {data.map((row, index) => {
+              let phoneNumber = '';
+              if (indexColumn !== null && indexColumn !== undefined && headers[indexColumn]) {
+                phoneNumber = row[headers[indexColumn]]?.toString().trim() || '';
+              }
+              const isInvalid =
+                invalidPhoneNumbers.length > 0 && invalidPhoneNumbers.includes(phoneNumber);
+              return (
+                <tr key={index} className={isInvalid ? 'invalid-phone' : ''}>
                   {headers.map((header, i) => (
                     <td key={i}>{row[header]}</td>
                   ))}
                 </tr>
-              ))}
-            </tbody>
+              );
+            })}
+          </tbody>
           </table>
         </div>
           {showSendMessage && (
@@ -286,6 +336,7 @@ const ReadExcel = () => {
           headers={headers}
           data={data}
           checkPhoneInvalid={checkPhoneInvalid}
+          SpinnerComponent={spinnerComponent}
           />}
 
            {showListTemplate && 
@@ -295,7 +346,7 @@ const ReadExcel = () => {
           headers={headers}
           data={data}
           checkPhoneInvalid={checkPhoneInvalid}
-
+          SpinnerComponent={spinnerComponent}
           />}
         </div>)}
       </div>
@@ -344,7 +395,6 @@ const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
 );
 
 const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessage, onToggleTemplate,onToggleMessageList,onToggleTemplateList }) => (
-
     <div className="send-message">
       <div className="send-head">
         <h1>Send Message</h1>
@@ -374,7 +424,6 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
     <button className="btn-message-list" onClick={onToggleMessageList}>
       <FontAwesomeIcon icon={faUpload} /> Message List
     </button>
-
       </div>
       <div className="send-footer">
         <button className="send-btn">
@@ -549,7 +598,7 @@ const handleSave = () => {
 );
 }
 
-const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhoneInvalid }) => {
+const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,checkPhoneInvalid }) => {
   const [existingTemplate, setExistingTemplate] = useState(
     (JSON.parse(localStorage.getItem('messages')) || []).reverse()
   );
@@ -557,7 +606,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
   const [sendMessage, setSendMessage] = useState(null);
-  const [getPhoneInvalid, setGetPhoneInvalid] = useState(null);
+  const [indexColumn, setIndexColumn] = useState(null);
   
   const handleSave = async () => {
     if (!sendMessage || !selectedData) {
@@ -568,11 +617,8 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
       });
       return;
     }
-  
-    let successCount = 0;
-    let errorCount = 0;
+    SpinnerComponent(true)
     let getId = [];
-  
     const fetchPromises = selectedData.map((dataItem) => {
       if (dataItem) {
         var myHeaders = new Headers();
@@ -591,36 +637,29 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
         return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
-            console.log(result.id);
             getId.push(result.id);
-            successCount++;
           })
           .catch((error) => {
-            console.error('Error:', error);
-            errorCount++;
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error,
+            });
           });
       }
       return Promise.resolve();
     });
   
     await Promise.all(fetchPromises);
-    console.log(getId);
-    setGetPhoneInvalid(getId);
-    checkPhoneInvalid(getPhoneInvalid);
-  
-    if (errorCount > 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Some messages failed to send.',
-      });
-    } else {
+    setTimeout(async() => {
+      await checkPhoneInvalid(getId,indexColumn);
+      SpinnerComponent(false)
       Swal.fire({
         icon: 'success',
         title: 'Success',
         text: 'All messages have been sent successfully.',
       });
-    }
+    }, 5000);
   };
 
   const handleCancel = () => {
@@ -628,7 +667,6 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
   };
 
   const handleSelectMessage = (index,template) => {
-    console.log(template);
     setSendMessage(template.message);
     setSelectedMessage(index);
   };
@@ -647,16 +685,26 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
 
   const handleDropdownChange = (e) => {
     const selectedIndex = e.target.value;
-    console.log(selectedIndex);
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
-      console.log(data.map(row => row[selectedIndex]));
-      setSelectedData(data.map(row => row[selectedIndex]));
+      const selectedData = data.map(row => row[selectedIndex]);
+      const nonNumberValues = selectedData.filter(value => isNaN(value));
+    
+      if (nonNumberValues.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Data',
+          text: 'Selected data must be numbers only.',
+        });
+        return;
+      }
+    
+      setSelectedData(selectedData);
+      setIndexColumn(dataIndex);
     }
   };
   
-
   return (
     <div className="send-message">
       <div className="send-head">
@@ -703,16 +751,18 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,checkPhon
   );
 };
 
-
-const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPhoneInvalid }) => {
+const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,checkPhoneInvalid }) => {
   const [existingTemplate, setExistingTemplate] = useState(
     JSON.parse(localStorage.getItem('template')).reverse() || []);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
   const [sendTemplate, setSendTemplate] = useState(null);
+  const [indexColumn, setIndexColumn] = useState(null);
+  const [selectedRadio, setSelectedRadio] = useState('sendAll');
 
-  const handleSave = () => {
+
+  const handleSave = async () => {
     if (!sendTemplate || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -721,10 +771,10 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPh
       });
       return;
     }
-    let successCount = 0;
-    let errorCount = 0;
-  
-    sendTemplate.forEach((template, index) => {
+
+    SpinnerComponent(true);
+    let getId = [];
+    const fetchPromises = sendTemplate.map((template, index) => {
       const dataItem = selectedData[index];
       if (dataItem) {
         var myHeaders = new Headers();
@@ -739,33 +789,33 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPh
           body: urlencoded,
           redirect: 'follow'
         };
-  
-        fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
-          .then(response => response.text())
+
+        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
+          .then(response => response.json())
           .then(result => {
-            console.log(result);
-            successCount++;
-            if (successCount === sendTemplate.length) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Template have been sent successfully.',
-              });
-            }
+            getId.push(result.id);
           })
           .catch(error => {
-            console.log('error', error);
-            errorCount++;
-            if (successCount + errorCount === sendTemplate.length) {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Some Template failed to send.',
-              });
-            }
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error,
+            });
           });
       }
+      return Promise.resolve();
     });
+
+    await Promise.all(fetchPromises);
+    setTimeout(async () => {
+      await checkPhoneInvalid(getId,indexColumn);
+      SpinnerComponent(false);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Template have been sent successfully.',
+      });
+    }, 5000);
   };
 
   const handleCancel = () => {
@@ -793,8 +843,6 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPh
     setSelectedTemplate(index); 
 };
 
-
-
   const handleEdit = (index) => {
     const messageToEdit = existingTemplate[index];
     onEditTemplate(messageToEdit);
@@ -812,9 +860,25 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPh
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
-      console.log(data.map(row => row[selectedIndex]));
-      setSelectedData(data.map(row => row[selectedIndex]));
+      const selectedData = data.map(row => row[selectedIndex]);
+      const nonNumberValues = selectedData.filter(value => isNaN(value));
+    
+      if (nonNumberValues.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Data',
+          text: 'Selected data must be numbers only.',
+        });
+        return;
+      }
+    
+      setSelectedData(selectedData);
+      setIndexColumn(dataIndex);
     }
+  };
+
+  const handleOptionChange = (e) => {
+    setSelectedRadio(e.target.value);
   };
 
   return (
@@ -854,6 +918,26 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,checkPh
                 <option key={index} value={header}>{header}</option>
               ))}
             </select>
+            <div className='choice-send'>
+            <label>
+        <input
+          type="radio"
+          value="sendAll"
+          checked={selectedOption === 'sendAll'}
+          onChange={handleOptionChange}
+        />
+        Send All
+      </label>
+      <label>
+        <input
+          type="radio"
+          value="selectSend"
+          checked={selectedOption === 'selectSend'}
+          onChange={handleOptionChange}
+        />
+        Select Send
+      </label>
+            </div>
           </div>
       <div className="btn-add">
         <button className="btn-save-add" onClick={handleSave}>
