@@ -337,6 +337,7 @@ const ReadExcel = () => {
           data={data}
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
+          setIndexColumn={setIndexColumn}
           />}
 
            {showListTemplate && 
@@ -347,6 +348,7 @@ const ReadExcel = () => {
           data={data}
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
+          setIndexColumn={setIndexColumn}
           />}
         </div>)}
       </div>
@@ -598,15 +600,18 @@ const handleSave = () => {
 );
 }
 
-const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,checkPhoneInvalid }) => {
-  const [existingTemplate, setExistingTemplate] = useState(
-    (JSON.parse(localStorage.getItem('messages')) || []).reverse()
-  );
+const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,checkPhoneInvalid,setIndexColumn }) => {
+  const [existingMessage, setExistingMessage] = useState(
+    JSON.parse(localStorage.getItem('messages')).reverse() || []);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
   const [sendMessage, setSendMessage] = useState(null);
-  const [indexColumn, setIndexColumn] = useState(null);
+  const [indexCol, setIndexCol] = useState(null);
+  const [showRadio, setShowRadio] = useState(false);
+  const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   
   const handleSave = async () => {
     if (!sendMessage || !selectedData) {
@@ -617,9 +622,19 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
       });
       return;
     }
-    SpinnerComponent(true)
+    if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please select a phone number.',
+      });
+      return;
+    }
+    setIndexColumn(null)
+    SpinnerComponent(true);
     let getId = [];
-    const fetchPromises = selectedData.map((dataItem) => {
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
       if (dataItem) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -633,7 +648,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           body: urlencoded,
           redirect: 'follow'
         };
-  
+
         return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
@@ -649,11 +664,11 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
       }
       return Promise.resolve();
     });
-  
+
     await Promise.all(fetchPromises);
-    setTimeout(async() => {
-      await checkPhoneInvalid(getId,indexColumn);
-      SpinnerComponent(false)
+    setTimeout(async () => {
+      await checkPhoneInvalid(getId, indexCol);
+      SpinnerComponent(false);
       Swal.fire({
         icon: 'success',
         title: 'Success',
@@ -672,14 +687,14 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   };
 
   const handleEdit = (index) => {
-    const messageToEdit = existingTemplate[index];
+    const messageToEdit = existingMessage[index];
     onEditMessage(messageToEdit);
   };
 
   const handleDelete = (index) => {
-    const updatedTemplates = existingTemplate.filter((_, i) => i !== index);
+    const updatedTemplates = existingMessage.filter((_, i) => i !== index);
     localStorage.setItem('messages', JSON.stringify(updatedTemplates.reverse()));
-    setExistingTemplate(updatedTemplates.reverse()); 
+    setExistingMessage(updatedTemplates.reverse()); 
     setSelectedMessage(null);
   };
 
@@ -697,11 +712,34 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           title: 'Invalid Data',
           text: 'Selected data must be numbers only.',
         });
+        setShowRadio(false);
         return;
       }
-    
+      setShowRadio(true);
       setSelectedData(selectedData);
-      setIndexColumn(dataIndex);
+      setIndexCol(dataIndex);
+    }
+    if(selectedIndex == ""){
+      setShowRadio(false);
+      }
+  };
+
+  const handleOptionChange = (e) => {
+    setSelectedRadioOption(e.target.value);
+    if (e.target.value === 'selectSend') {
+      setShowPhoneNumber(true);
+    } else {
+      setShowPhoneNumber(false);
+    }
+  };
+
+  const handleSelectPhoneNumber = (value, index) => {
+    if (selectedPhoneNumber.some((item) => item.value === value)) {
+      setSelectedPhoneNumber((prev) =>
+        prev.filter((item) => item.value !== value)
+      );
+    } else {
+      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
     }
   };
   
@@ -711,7 +749,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         <h1>Message List</h1>
       </div>
       <div className="message-item-container">
-        {existingTemplate.map((template, index) => (
+        {existingMessage.map((template, index) => (
           <div key={index} className="message-item">
             <div className="action-container">
               <div className="control-checked">
@@ -735,13 +773,64 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         ))}
       </div>
       <div className='dropdown-container'>
-            <label>Select Option:</label>
+          <div className='dropdown-phone-container'>
+            <label>Select Phone Number:</label>
             <select value={selectedOption} onChange={handleDropdownChange}>
               <option value="">.....</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
             </select>
+          </div>
+          {showRadio &&(<div className='choice-send'>
+            <label>
+              <input
+                type="radio"
+                value="sendAll"
+                checked={selectedRadioOption === 'sendAll'}
+                onChange={handleOptionChange}
+              />
+              Send All
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="selectSend"
+                checked={selectedRadioOption === 'selectSend'}
+                onChange={handleOptionChange}
+              />
+              Select Send
+          </label>
+            </div>)}
+          {showPhoneNumber && (
+              <div className="selected-phone-number">
+                <label>Select Phone Numbers:</label>
+                <div className="select-phone-control">
+                  {selectedData.filter(value => value).map((value, index) => (
+                    <div className="select-phone" key={index}>
+                      <div className="control-checked">
+                        {selectedPhoneNumber.some((item) => item.value === value) && (
+                          <div className="icon-checked">
+                            <FontAwesomeIcon icon={faCheck} />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleSelectPhoneNumber(value, index)}
+                        className={
+                          selectedPhoneNumber.some((item) => item.value === value)
+                            ? "selected"
+                            : ""
+                        }
+                      >
+                        {value}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+           
           </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Send Template</button>
@@ -751,17 +840,18 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   );
 };
 
-const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,checkPhoneInvalid }) => {
+const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,checkPhoneInvalid,setIndexColumn }) => {
   const [existingTemplate, setExistingTemplate] = useState(
     JSON.parse(localStorage.getItem('template')).reverse() || []);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
   const [sendTemplate, setSendTemplate] = useState(null);
-  const [indexColumn, setIndexColumn] = useState(null);
-  const [selectedRadio, setSelectedRadio] = useState('sendAll');
-
-
+  const [indexCol, setIndexCol] = useState(null);
+  const [showRadio, setShowRadio] = useState(false);
+  const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   const handleSave = async () => {
     if (!sendTemplate || !selectedData) {
       Swal.fire({
@@ -771,11 +861,20 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       });
       return;
     }
-
+    if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please select a phone number.',
+      });
+      return;
+    }
+    setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
-    const fetchPromises = sendTemplate.map((template, index) => {
-      const dataItem = selectedData[index];
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
       if (dataItem) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -808,7 +907,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
-      await checkPhoneInvalid(getId,indexColumn);
+      await checkPhoneInvalid(getId, indexCol);
       SpinnerComponent(false);
       Swal.fire({
         icon: 'success',
@@ -839,6 +938,8 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
             return updatedTemplate;
         });
         setSendTemplate(updatedTemplates);
+    } else {
+        setSendTemplate([templateValue]);
     }
     setSelectedTemplate(index); 
 };
@@ -857,28 +958,49 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
 
   const handleDropdownChange = (e) => {
     const selectedIndex = e.target.value;
+    console.log(selectedIndex);
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       const selectedData = data.map(row => row[selectedIndex]);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
     
-      if (nonNumberValues.length > 0) {
+      if (nonNumberValues.length > 0 ) {
         Swal.fire({
           icon: 'error',
           title: 'Invalid Data',
           text: 'Selected data must be numbers only.',
         });
+      setShowRadio(false);
+
         return;
       }
-    
+      setShowRadio(true);
       setSelectedData(selectedData);
-      setIndexColumn(dataIndex);
+      setIndexCol(dataIndex);
     }
+    if(selectedIndex == ""){
+      setShowRadio(false);
+      }
   };
 
   const handleOptionChange = (e) => {
-    setSelectedRadio(e.target.value);
+    setSelectedRadioOption(e.target.value);
+    if (e.target.value === 'selectSend') {
+      setShowPhoneNumber(true);
+    } else {
+      setShowPhoneNumber(false);
+    }
+  };
+
+  const handleSelectPhoneNumber = (value, index) => {
+    if (selectedPhoneNumber.some((item) => item.value === value)) {
+      setSelectedPhoneNumber((prev) =>
+        prev.filter((item) => item.value !== value)
+      );
+    } else {
+      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
+    }
   };
 
   return (
@@ -911,6 +1033,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         ))}
       </div>
       <div className='dropdown-container'>
+          <div className='dropdown-phone-container'>
             <label>Select Option:</label>
             <select value={selectedOption} onChange={handleDropdownChange}>
               <option value="">.....</option>
@@ -918,26 +1041,56 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
                 <option key={index} value={header}>{header}</option>
               ))}
             </select>
-            <div className='choice-send'>
+           </div>
+           {showRadio &&(<div className='choice-send'>
             <label>
-        <input
-          type="radio"
-          value="sendAll"
-          checked={selectedOption === 'sendAll'}
-          onChange={handleOptionChange}
-        />
-        Send All
-      </label>
-      <label>
-        <input
-          type="radio"
-          value="selectSend"
-          checked={selectedOption === 'selectSend'}
-          onChange={handleOptionChange}
-        />
-        Select Send
-      </label>
-            </div>
+              <input
+                type="radio"
+                value="sendAll"
+                checked={selectedRadioOption === 'sendAll'}
+                onChange={handleOptionChange}
+              />
+              Send All
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="selectSend"
+                checked={selectedRadioOption === 'selectSend'}
+                onChange={handleOptionChange}
+              />
+              Select Send
+          </label>
+            </div>)}
+              {showPhoneNumber && (
+              <div className="selected-phone-number">
+                <label>Select Phone Numbers:</label>
+                <div className="select-phone-control">
+                  {selectedData.filter(value => value).map((value, index) => (
+                    <div className="select-phone" key={index}>
+                      <div className="control-checked">
+                        {selectedPhoneNumber.some((item) => item.value === value) && (
+                          <div className="icon-checked">
+                            <FontAwesomeIcon icon={faCheck} />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleSelectPhoneNumber(value, index)}
+                        className={
+                          selectedPhoneNumber.some((item) => item.value === value)
+                            ? "selected"
+                            : ""
+                        }
+                      >
+                        {value}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
           </div>
       <div className="btn-add">
         <button className="btn-save-add" onClick={handleSave}>
