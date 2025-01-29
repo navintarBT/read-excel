@@ -645,8 +645,10 @@ const handleSave = () => {
 
 const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
   checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
-  const [existingMessage, setExistingMessage] = useState(
-    JSON.parse(localStorage.getItem('messages')).reverse() || []);
+    const [existingMessage, setExistingMessage] = useState(() => {
+      const storedMessages = localStorage.getItem('messages');
+      return storedMessages ? JSON.parse(storedMessages).reverse() : [];
+  });
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
@@ -727,8 +729,13 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const handleCancel = () => {
     onToggleMessageList(false);
   };
-
+//111
   const handleSelectMessage = (index,template) => {
+    if (selectedMessage === index) {
+      setSelectedMessage(null); 
+      setSendMessage(null); 
+      return;
+  }
     setSendMessage(template.message);
     setSelectedMessage(index);
   };
@@ -892,8 +899,10 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
 
 const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,
   checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
-  const [existingTemplate, setExistingTemplate] = useState(
-    JSON.parse(localStorage.getItem('template')).reverse() || []);
+    const [existingTemplate, setExistingTemplate] = useState(() => {
+      const storedTemplate = localStorage.getItem('template');
+      return storedTemplate ? JSON.parse(storedTemplate).reverse() : [];
+  });
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedData, setSelectedData] = useState(null);
@@ -904,6 +913,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   const handleSave = async () => {
+    console.log(sendTemplate)
     if (!sendTemplate || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -976,6 +986,11 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   };
 
   const handleSelectTemplate = (index, template) => {
+    if (selectedTemplate === index) {
+      setSelectedTemplate(null); 
+      setSendTemplate(null); 
+      return;
+  }
     let templateValue = template.template;
     const regex = /{{(.*?)}}/g; 
     const matches = [...templateValue.matchAll(regex)];
