@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import './readExcel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload, faPaperPlane, faPlus, faCommentDots, faFileAlt ,faCheck,faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faPaperPlane, faPlus, faCommentDots, faFileAlt ,faCheck,faEdit, faTrash,faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 import logo from '../logo/systory_logo_final-1-e1578037567378.png';
 import Swal from 'sweetalert2';
 
@@ -13,6 +13,7 @@ const ReadExcel = () => {
   const [showUpload, setShowUpload] = useState(true);
   const [showSendMessage, setShowSendMessage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingShow, setIsDraggingShow] = useState(false);
   const [showCreateMessage, setShowCreateMessage] = useState(false);
   const [showCreateTemplate, setShowCreateTemplate] = useState(false);
   const [showListTemplate, setShowListTemplate] = useState(false);
@@ -23,6 +24,13 @@ const ReadExcel = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [invalidPhoneNumbers, setInvalidPhoneNumbers] = useState([]);
   const [indexColumn, setIndexColumn] = useState(null);
+  const [getAmountSend, setGetAmountSend] = useState(parseInt(localStorage.getItem('amountSend'), 10) || 0);
+  const today = new Date().toISOString().split('T')[0]; 
+  const lastDate = localStorage.getItem('lastUpdateDate') || '';
+  if (lastDate !== today) {
+    setGetAmountSend(0);
+    localStorage.setItem('lastUpdateDate', today); 
+  }
 
   const handleFileUpload = (file) => {
     const validExtensions = ['xlsx', 'xls', 'csv'];
@@ -106,6 +114,16 @@ const ReadExcel = () => {
     setShowListTemplate(false);
   };
 
+  const handleToggleBackHome = () => {
+    setShowCreateMessage(false);
+    setShowSendMessage(false);
+    setShowCreateTemplate(false);
+    setShowListMessage(false);
+    setShowListTemplate(false);
+    setShowUpload(true)
+    setShowContent(false)
+  };
+
   const handleToggleTemplate = () => {
     setShowCreateTemplate(true);
     setShowSendMessage(false);
@@ -180,18 +198,32 @@ const ReadExcel = () => {
     const file = event.dataTransfer.files[0];
     handleFileUpload(file);
     setIsDragging(false);
+    setIsDraggingShow(false);
   };
 
   const handleDragOver = (event) => {
     event.preventDefault();
+    event.stopPropagation();
   };
 
-  const handleDragEnter = () => {
-    setIsDragging(true);
+  const handleDragEnter = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const showTableElement = document.querySelector('.show-table');
+    if (showTableElement) {
+      setIsDraggingShow(true)
+    } else {
+      setIsDragging(true);
+    }
   };
 
-  const handleDragLeave = () => {
-    setIsDragging(false);
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget)) {
+      setIsDragging(false);
+      setIsDraggingShow(false)
+    }
   };
 
   const clearMessageToEdit = () => {
@@ -267,7 +299,7 @@ const ReadExcel = () => {
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
       >
-        {isDragging && <div className="drag-text">Please drop file Excel</div>}
+        {isDragging && <div className="drag-text">Please drop Excel file</div>}
         {showUpload && (
           <UploadSection
             onClick={handleButtonClick}
@@ -276,12 +308,13 @@ const ReadExcel = () => {
           />
         )}
         {showContent && (<div className="content">
-        <div className="show-table">
-          <table>
-            <thead>
+        <div className={`show-table ${isDraggingShow ? 'dragging' : ''}`}>
+        {isDraggingShow && <div className="drag-text-table" >Please drop Excel file</div>}
+          <table >
+            <thead >
               <tr>
                 {headers.map((header, index) => (
-                  <th key={index}>{header}</th>
+                  <th key={index} style={{ backgroundColor: isDraggingShow ? " " : "#f2f2f2" }}>{header}</th>
                 ))}
               </tr>
             </thead>
@@ -313,6 +346,8 @@ const ReadExcel = () => {
               onToggleTemplate={handleToggleTemplate}
               onToggleTemplateList={handleToggleTemplateList}
               onToggleMessageList={handleToggleMessageList}
+              getAmountSend={getAmountSend}
+              handleToggleBackHome={handleToggleBackHome}
             />
           )}
           {showCreateMessage && 
@@ -338,6 +373,8 @@ const ReadExcel = () => {
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
           setIndexColumn={setIndexColumn}
+          setGetAmountSend={setGetAmountSend}
+          getAmountSend={getAmountSend}
           />}
 
            {showListTemplate && 
@@ -349,6 +386,8 @@ const ReadExcel = () => {
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
           setIndexColumn={setIndexColumn}
+          setGetAmountSend={setGetAmountSend}
+          getAmountSend={getAmountSend}
           />}
         </div>)}
       </div>
@@ -382,7 +421,7 @@ const Header = () => (
 const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
   <div className='upload'>
     <h1>Send Message</h1>
-    <h2>Please select a file to send a message to the customer</h2>
+    <h2>Please select a file to send a message </h2>
     <button className="upload-btn" onClick={onClick}>
        Select Excel Files <br /> (.xls, .xlsx) <FontAwesomeIcon icon={faUpload} />
     </button>
@@ -396,10 +435,14 @@ const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
   </div>
 );
 
-const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessage, onToggleTemplate,onToggleMessageList,onToggleTemplateList }) => (
+const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessage, onToggleTemplate,
+  onToggleMessageList,onToggleTemplateList,getAmountSend,handleToggleBackHome }) => (
     <div className="send-message">
       <div className="send-head">
+      <div className='amount-send'>
         <h1>Send Message</h1>
+        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        </div>
       </div>
       <div className="send-body-list">
         <div className="icon-circle" onClick={onClick} data-tooltip="Add new file">
@@ -420,17 +463,17 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
         />
       </div>
       <div className='list-message'>
-      <button className="btn-template-list" onClick={onToggleTemplateList}>
-      <FontAwesomeIcon icon={faUpload} /> Template List
+      <button className="btn-list" onClick={onToggleTemplateList}>
+      Template List <FontAwesomeIcon icon={faUpload} /> 
     </button>
-    <button className="btn-message-list" onClick={onToggleMessageList}>
-      <FontAwesomeIcon icon={faUpload} /> Message List
+    <button className="btn-list" onClick={onToggleMessageList}>
+       Message List <FontAwesomeIcon icon={faUpload} />
     </button>
+    <button className="send-btn" onClick ={handleToggleBackHome}>
+        <FontAwesomeIcon icon={faArrowLeft}  />Back To Home
+        </button>
       </div>
       <div className="send-footer">
-        <button className="send-btn">
-          Send Message <FontAwesomeIcon icon={faPaperPlane} />
-        </button>
       </div>
     </div>
 );
@@ -600,7 +643,8 @@ const handleSave = () => {
 );
 }
 
-const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,checkPhoneInvalid,setIndexColumn }) => {
+const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
   const [existingMessage, setExistingMessage] = useState(
     JSON.parse(localStorage.getItem('messages')).reverse() || []);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -612,7 +656,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
-  
+
   const handleSave = async () => {
     if (!sendMessage || !selectedData) {
       Swal.fire({
@@ -667,6 +711,9 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
+      const count = getId.length;
+      localStorage.setItem('amountSend', getAmountSend + count);
+      setGetAmountSend(getAmountSend + count);
       await checkPhoneInvalid(getId, indexCol);
       SpinnerComponent(false);
       Swal.fire({
@@ -746,7 +793,10 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   return (
     <div className="send-message">
       <div className="send-head">
+        <div className='amount-send'>
         <h1>Message List</h1>
+        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        </div>
       </div>
       <div className="message-item-container">
         {existingMessage.map((template, index) => (
@@ -774,32 +824,32 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
       </div>
       <div className='dropdown-container'>
           <div className='dropdown-phone-container'>
-            <label>Select Phone Number:</label>
-            <select value={selectedOption} onChange={handleDropdownChange}>
-              <option value="">.....</option>
+            <label>Select Phone Number Column:</label>
+            <select className='dropdown-select' value={selectedOption} onChange={handleDropdownChange}>
+            <option value="" disabled>Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
             </select>
           </div>
           {showRadio &&(<div className='choice-send'>
-            <label>
+            <label className={`radio-button ${selectedRadioOption === 'sendAll' ? 'selected' : ''}`}>
               <input
                 type="radio"
                 value="sendAll"
                 checked={selectedRadioOption === 'sendAll'}
                 onChange={handleOptionChange}
               />
-              Send All
+              Send to all
             </label>
-            <label>
+            <label className={`radio-button ${selectedRadioOption === 'selectSend' ? 'selected' : ''}`}>
               <input
                 type="radio"
                 value="selectSend"
                 checked={selectedRadioOption === 'selectSend'}
                 onChange={handleOptionChange}
               />
-              Select Send
+              Select to send
           </label>
             </div>)}
           {showPhoneNumber && (
@@ -833,14 +883,15 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
            
           </div>
       <div className='btn-add'>
-        <button className='btn-save-add' onClick={handleSave}>Send Template</button>
+        <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
         <button className='btn-cancel-add' onClick={handleCancel}>Back</button>
       </div>
     </div>
   );
 };
 
-const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,checkPhoneInvalid,setIndexColumn }) => {
+const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
   const [existingTemplate, setExistingTemplate] = useState(
     JSON.parse(localStorage.getItem('template')).reverse() || []);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -907,6 +958,9 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
+      const count = getId.length;
+      localStorage.setItem('amountSend', getAmountSend + count);
+      setGetAmountSend(getAmountSend + count);
       await checkPhoneInvalid(getId, indexCol);
       SpinnerComponent(false);
       Swal.fire({
@@ -1006,7 +1060,10 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   return (
     <div className="send-message">
       <div className="send-head">
+      <div className='amount-send'>
         <h1>Template List</h1>
+        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        </div>
       </div>
       <div className="message-item-container">
         {existingTemplate.map((template, index) => (
@@ -1034,32 +1091,32 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       </div>
       <div className='dropdown-container'>
           <div className='dropdown-phone-container'>
-            <label>Select Option:</label>
-            <select value={selectedOption} onChange={handleDropdownChange}>
-              <option value="">.....</option>
+            <label>Select Phone Number Column:</label>
+            <select className='dropdown-select'value={selectedOption} onChange={handleDropdownChange}>
+            <option value="" disabled>Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
             </select>
            </div>
            {showRadio &&(<div className='choice-send'>
-            <label>
+            <label className={`radio-button ${selectedRadioOption === 'sendAll' ? 'selected' : ''}`}>
               <input
                 type="radio"
                 value="sendAll"
                 checked={selectedRadioOption === 'sendAll'}
                 onChange={handleOptionChange}
               />
-              Send All
+              Send to all
             </label>
-            <label>
+            <label className={`radio-button ${selectedRadioOption === 'selectSend' ? 'selected' : ''}`}>
               <input
                 type="radio"
                 value="selectSend"
                 checked={selectedRadioOption === 'selectSend'}
                 onChange={handleOptionChange}
               />
-              Select Send
+              Select to send
           </label>
             </div>)}
               {showPhoneNumber && (
@@ -1094,7 +1151,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           </div>
       <div className="btn-add">
         <button className="btn-save-add" onClick={handleSave}>
-          Send Template
+          Send Template <FontAwesomeIcon icon={faPaperPlane}/>
         </button>
         <button className="btn-cancel-add" onClick={handleCancel}>
           Back
