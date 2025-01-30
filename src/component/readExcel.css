@@ -749,3 +749,7 @@ padding-bottom: 5px;
     border-color: #007bff;
     outline: none;
   }
+
+  .empty-phone {
+    background-color: red; 
+  }

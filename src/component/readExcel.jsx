@@ -25,12 +25,15 @@ const ReadExcel = () => {
   const [invalidPhoneNumbers, setInvalidPhoneNumbers] = useState([]);
   const [indexColumn, setIndexColumn] = useState(null);
   const [getAmountSend, setGetAmountSend] = useState(parseInt(localStorage.getItem('amountSend'), 10) || 0);
-  const today = new Date().toISOString().split('T')[0]; 
+  const today = new Date().toISOString().split('T')[0];
   const lastDate = localStorage.getItem('lastUpdateDate') || '';
   if (lastDate !== today) {
     setGetAmountSend(0);
+    console.log("object");
+    localStorage.setItem('amountSend', 0);
     localStorage.setItem('lastUpdateDate', today); 
   }
+  console.log(getAmountSend);
 
   const handleFileUpload = (file) => {
     const validExtensions = ['xlsx', 'xls', 'csv'];
@@ -645,6 +648,7 @@ const handleSave = () => {
 
 const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
   checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
+    console.log(getAmountSend);
     const [existingMessage, setExistingMessage] = useState(() => {
       const storedMessages = localStorage.getItem('messages');
       return storedMessages ? JSON.parse(storedMessages).reverse() : [];
@@ -990,28 +994,19 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       setSelectedTemplate(null); 
       setSendTemplate(null); 
       return;
-  }
-    let templateValue = template.template;
-    const regex = /{{(.*?)}}/g; 
-    const matches = [...templateValue.matchAll(regex)];
-    if (matches.length > 0) {
-        const updatedTemplates = data.map(row => {
-            let updatedTemplate = templateValue;
-            matches.forEach(match => {
-                const placeholder = match[0]; 
-                const key = match[1]; 
-                if (row[key] !== undefined) {
-                    updatedTemplate = updatedTemplate.replace(placeholder, row[key]); 
-                }
-            });
-            return updatedTemplate;
-        });
-        setSendTemplate(updatedTemplates);
-    } else {
-        setSendTemplate([templateValue]);
     }
-    setSelectedTemplate(index); 
-};
+    let templateValue = template.template;
+    templateValue = templateValue.replace(/{{{+/g, '{{').replace(/}}}+/g, '}}');
+    const regex = /{{\s*([a-zA-Z0-9_ก-๙ກ-ໝ\s]+)\s*}}/g;
+    const updatedTemplates = data.map((row) => {
+      return templateValue.replace(regex, (match, key) => {
+        key = key.trim();
+        return row[key] !== undefined ? row[key] : '';
+      });
+    });
+    setSendTemplate(updatedTemplates.length > 0 ? updatedTemplates : ['']);
+    setSelectedTemplate(index);
+  };
 
   const handleEdit = (index) => {
     const messageToEdit = existingTemplate[index];
