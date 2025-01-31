@@ -167,49 +167,6 @@ nav {
 
 }
 
-@media (max-width: 768px) {
-  nav {
-    padding: 0 10px;
-  }
-  .footer-copy {
-    padding: 0 10px;
-  }
-  h1 {
-    font-size: 2rem;
-    margin: 15px 0;
-  }
-
-}
-
-@media (max-width: 480px) {
-  nav {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0 5px;
-  }
-  .footer-copy {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0 5px;
-  }
-  .content{
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0 5px; 
-  }
-  .upload-btn {
-    width: 150px;
-    height: 40px;
-    font-size: 14px;
-  }
-  h1 {
-    font-size: 1.5rem;
-    margin: 10px 0;
-  }
-
-  
-}
-
 .content{
   display: flex;
   padding: 15px 0 5px 5px;
@@ -398,7 +355,7 @@ h1 {
   align-items: center;
   padding: 5px;
   gap: 15px; 
-  margin-top: 15px;
+  margin-top: 5px;
 }
 
 .btn-cancel-add{
@@ -546,10 +503,9 @@ h1 {
 }
 
 .message-item-container {
-  margin-top: 5%;
   flex-direction: column;
   justify-content: center;
-  height: 40%;
+  height: 38%;
   width: 100%;
   overflow-y: auto;
 }
@@ -711,7 +667,6 @@ padding-bottom: 5px;
 
   .amount-send h1,h3{
     margin: 0;
-
   }
 
   .amount-send{
@@ -751,5 +706,167 @@ padding-bottom: 5px;
   }
 
   .empty-phone {
-    background-color: red; 
+    background-color: #e5322d; 
   }
+
+  .add-message-list{
+    display: flex;
+    justify-content: right;
+    padding: 0 10px 0 0;
+  }
+
+  .icon-add-message {
+    width: 30px;
+    height: 30px;
+    background-color: #e5322d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    transition: all 0.3s ease;
+    outline: none;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .icon-add-message svg {
+    color: white;
+    font-size: 20px;
+  }
+  
+  .icon-add-message:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(229, 50, 45, 0.3);
+  }
+  
+  .icon-add-message::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 50%;
+    right: 110%; 
+    transform: translateY(-50%); 
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; 
+    font-size: 14px
+}
+
+.icon-add-message:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-5px); 
+}
+
+@media (max-width: 1024px) {
+  nav {
+    padding: 0 10px;
+  }
+  .footer-copy {
+    padding: 0 10px;
+  }
+  h1 {
+    font-size: 2rem;
+    margin: 15px 0;
+  }
+  .amount-send h1{
+    font-size: 25px;
+  }
+  .amount-send h3{
+    font-size: 16px;
+  }
+
+  .send-body-list{
+    margin-top: 6%;
+  }
+
+  .btn-list{
+    height: 100px; 
+    font-size: 18px;
+    gap: 8px;
+  }
+
+  .send-btn {
+    font-size: 16px;
+    height: 45px;
+  }
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .icon-add-message {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+    margin: 5px;
+  }
+  
+  .icon-add-message svg {
+    color: white;
+    font-size: 17px;
+  }
+
+  .action-container button {
+    height: 35px; 
+    font-size: 14px;
+  }
+
+  .choice-send{
+    gap: 10px;
+    font-size: 12px;
+  }
+  .dropdown-phone-container label{
+    font-size: 12px;
+  }
+  .selected-phone-number label{
+    font-size: 12px;
+  }
+
+  .dropdown-select {
+    padding: 5px;
+    font-size: 14px;
+  }
+
+  .message-item-container {
+    height: 34%;
+  }
+  .select-phone button{
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+}
+
+@media (max-width: 480px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+  }
+  .footer-copy {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+  }
+  .content{
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px; 
+  }
+  .upload-btn {
+    width: 150px;
+    height: 40px;
+    font-size: 14px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+}
