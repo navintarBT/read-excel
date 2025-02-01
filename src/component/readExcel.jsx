@@ -243,7 +243,7 @@ const ReadExcel = () => {
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
     const fetchPromises = ids.map((id) => {
       var urlencoded = new URLSearchParams();
-      urlencoded.append("token", "kevozeqh6t0p78qs");
+      urlencoded.append("token", "uwetp05gfbbjkc2g");
       urlencoded.append("page", "1");
       urlencoded.append("limit", "10");
       urlencoded.append("status", "all");
@@ -262,8 +262,8 @@ const ReadExcel = () => {
         headers: myHeaders,
         redirect: 'follow'
       };
-  
-      return fetch("https://api.ultramsg.com/instance96828/messages?" + urlencoded, requestOptions)
+  //111
+      return fetch("https://api.ultramsg.com/instance104874/messages?" + urlencoded, requestOptions)
         .then(response => response.json())
         .then(result => {
           console.log(result)
@@ -689,7 +689,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "kevozeqh6t0p78qs");
+        urlencoded.append("token", "uwetp05gfbbjkc2g");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${sendMessage}`);
         var requestOptions = {
@@ -698,8 +698,8 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           body: urlencoded,
           redirect: 'follow'
         };
-
-        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
+//333
+        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
             getId.push(result.id);
@@ -733,7 +733,6 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const handleCancel = () => {
     onToggleMessageList(false);
   };
-//111
   const handleSelectMessage = (index,template) => {
     if (selectedMessage === index) {
       setSelectedMessage(null); 
@@ -944,7 +943,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "kevozeqh6t0p78qs");
+        urlencoded.append("token", "uwetp05gfbbjkc2g");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${template}`);
         var requestOptions = {
@@ -953,8 +952,8 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           body: urlencoded,
           redirect: 'follow'
         };
-
-        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
+//222
+        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then(result => {
             getId.push(result.id);
