@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import './readExcel.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload, faPaperPlane, faPlus, faCommentDots, faFileAlt ,faCheck,faEdit, faTrash,faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faPaperPlane, faPlus, faCommentDots, faFileAlt ,faCheck,faEdit, faTrash,faArrowLeft,faBars} from '@fortawesome/free-solid-svg-icons';
 import logo from '../logo/systory_logo_final-1-e1578037567378.png';
 import Swal from 'sweetalert2';
 
@@ -33,6 +33,8 @@ const ReadExcel = () => {
     localStorage.setItem('amountSend', 0);
     localStorage.setItem('lastUpdateDate', today); 
   }
+
+  console.log(window.devicePixelRatio); 
 
   const handleFileUpload = (file) => {
     const validExtensions = ['xlsx', 'xls', 'csv'];
@@ -407,9 +409,9 @@ const ReadExcel = () => {
 const Header = () => (
   <header className="header">
     <nav>
-    <div className="logo">
-      <img src={logo} alt="Logo" />
-    </div>
+      <div className="logo">
+        <img src={logo} alt="Logo" />
+      </div>
       <div className="menu">
         <ul>
           <li><a href="#home">Home</a></li>
@@ -419,8 +421,7 @@ const Header = () => (
         </ul>
       </div>
       <div className="action">
-        <button className="login-btn">Login</button>
-        <button className="signup-btn">Sign Up</button>
+        <FontAwesomeIcon icon={faBars} style={{  height: '25px' }} />
       </div>
     </nav>
   </header>
@@ -448,7 +449,7 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
     <div className="send-message">
       <div className="send-head">
       <div className='amount-send'>
-        <h1>Send Message</h1>
+        <h2>Send Message</h2>
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
       </div>
@@ -534,7 +535,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
   return (
     <div className="send-message">
       <div className="send-head">
-        <h1>{title.header}</h1>
+        <h2>{title.header}</h2>
       </div>
       <div className="send-body">
 
@@ -615,7 +616,7 @@ const handleSave = () => {
   return(
   <div className="send-message">
   <div className="send-head">
-    <h1>{title.header}</h1>
+    <h2>{title.header}</h2>
   </div>
   <div className="send-body">
   <div className='textarea-container'>
@@ -813,7 +814,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     <div className="send-message">
       <div className="send-head">
         <div className='amount-send'>
-        <h1>Message List</h1>
+        <h2>Message List</h2>
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
       </div>
@@ -834,7 +835,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
                 )}
               </div>
               <button value={template.template} onClick={() => handleSelectMessage(index,template)}>
-                {template.name}
+                {template.name.length > 22 ? `${template.name.slice(0, 22)}...` : template.name}
               </button>
               <div className="icon-edit" onClick={() => handleEdit(index)}>
                 <FontAwesomeIcon icon={faEdit} />
@@ -897,7 +898,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
                             : ""
                         }
                       >
-                        {value}
+                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
                       </button>
                     </div>
                   ))}
@@ -929,84 +930,122 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
+  // const handleSave = async () => {
+
+  //   if (!sendTemplate || !selectedData) {
+  //     Swal.fire({
+  //       icon: 'warning',
+  //       title: 'Warning',
+  //       text: 'Selected data and template cannot be empty.',
+  //     });
+  //     return;
+  //   }
+  //   if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Error',
+  //       text: 'Please select a phone number.',
+  //     });
+  //     return;
+  //   }
+  //   const emptyIndexes = selectedData
+  //   .map((item, index) => (item === "" ? index : -1))
+  //   .filter(index => index !== -1);
+
+  //   setPhoneNumberEmpty([])
+  //   setIndexColumn(null)
+  //   SpinnerComponent(true);
+  //   let getId = [];
+  //   const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
+  //     const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+  //     const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
+  //     if (dataItem) {
+  //       var myHeaders = new Headers();
+  //       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+  //       var urlencoded = new URLSearchParams();
+  //       urlencoded.append("token", "uwetp05gfbbjkc2g");
+  //       urlencoded.append("to", `+85620${dataItem}`);
+  //       urlencoded.append("body", `${template}`);
+  //       var requestOptions = {
+  //         method: 'POST',
+  //         headers: myHeaders,
+  //         body: urlencoded,
+  //         redirect: 'follow'
+  //       };
+
+  //       return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+  //         .then(response => response.json())
+  //         .then(result => {
+  //           getId.push(result.id);
+  //         })
+  //         .catch(error => {
+  //           Swal.fire({
+  //             icon: 'error',
+  //             title: 'Error',
+  //             text: error,
+  //           });
+  //         });
+  //     }
+  //     return Promise.resolve();
+  //   });
+
+  //   await Promise.all(fetchPromises);
+  //   setTimeout(async () => {
+  //     const count = getId.length;
+  //     localStorage.setItem('amountSend', getAmountSend + count);
+  //     setGetAmountSend(getAmountSend + count);
+  //     if(selectedRadioOption === 'selectSend'){
+  //     await checkPhoneInvalid(getId, indexCol,[]);
+  //     }else{
+  //     await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+  //     }
+  //     SpinnerComponent(false);
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Success',
+  //       text: 'Template have been sent successfully.',
+  //     });
+  //   }, 5000);
+  // };
+
   const handleSave = async () => {
-
-    if (!sendTemplate || !selectedData) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Warning',
-        text: 'Selected data and template cannot be empty.',
+    const accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbl9zZXNzaW9uIjpudWxsLCJmYl9uYW1lIjoiTidUYXIgTmF2aW4iLCJmYl9pZCI6IjI1MTIzNTU3OTk5NTg5MyIsImlhdCI6MTczODU3NjQ3NCwic2Vzc2lvbl9pZCI6IlROYytZL0xTVTdQK1hqZEhWWDFPVW1XOHgrMFBrbWhxSTVLN0M0a09RcGMiLCJ1aWQiOiI1NTlkNjNkOC1kYzg1LTQzZDEtOGExZS03Njc1MGVhYjRhYzMiLCJhcHBsaWNhdGlvbiI6MSwiZXhwIjoxNzQ2MzUyNDc0LCJuYW1lIjoiTidUYXIgTmF2aW4ifQ.C9vjRHZf6pAk89EUUiIWOaw30yYHJThUqNVPkDZNAQU";
+    const pageId = "104102788235946";
+    const conversationId = "104102788235946_9449963831709835";
+    const url = `https://pages.fm/api/v1/pages/${pageId}/conversations/${conversationId}/messages?access_token=${accessToken}&&action=reply_inbox`;
+  
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: "message from template",
+        }),
       });
-      return;
-    }
-    if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please select a phone number.',
-      });
-      return;
-    }
-    const emptyIndexes = selectedData
-    .map((item, index) => (item === "" ? index : -1))
-    .filter(index => index !== -1);
-
-    setPhoneNumberEmpty([])
-    setIndexColumn(null)
-    SpinnerComponent(true);
-    let getId = [];
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
-      if (dataItem) {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
-        urlencoded.append("to", `+85620${dataItem}`);
-        urlencoded.append("body", `${template}`);
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: urlencoded,
-          redirect: 'follow'
-        };
-
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
-          .then(response => response.json())
-          .then(result => {
-            getId.push(result.id);
-          })
-          .catch(error => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error,
-            });
-          });
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: "Failed to send message",
+        }));
+        throw new Error(errorData.message || "Failed to send message");
       }
-      return Promise.resolve();
-    });
-
-    await Promise.all(fetchPromises);
-    setTimeout(async () => {
-      const count = getId.length;
-      localStorage.setItem('amountSend', getAmountSend + count);
-      setGetAmountSend(getAmountSend + count);
-      if(selectedRadioOption === 'selectSend'){
-      await checkPhoneInvalid(getId, indexCol,[]);
-      }else{
-      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
-      }
-      SpinnerComponent(false);
+  
+      const result = await response.json();
+      console.log("✅ Success:", result);
+      Swal.fire("Success!", "Message sent!", "success");
+    } catch (error) {
+      console.error("❌ Error:", error);
       Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Template have been sent successfully.',
+        icon: "error",
+        title: "Error",
+        text: error.message || "An unexpected error occurred.",
       });
-    }, 5000);
+    }
   };
-
+  
+  
   const handleCancel = () => {
     onToggleTemplateList(false);
   };
@@ -1092,7 +1131,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     <div className="send-message">
       <div className="send-head">
       <div className='amount-send'>
-        <h1>Template List</h1>
+        <h2>Template List</h2>
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
       </div>
@@ -1113,7 +1152,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
                 )}
               </div>
               <button value={template.template} onClick={() => handleSelectTemplate(index,template)}>
-                {template.name}
+                {template.name.length > 18 ? `${template.name.slice(0, 18)}...` : template.name}
               </button>
               <div className="icon-edit" onClick={() => handleEdit(index,template)}data-tooltip="edit">
                 <FontAwesomeIcon icon={faEdit} />
@@ -1176,7 +1215,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
                             : ""
                         }
                       >
-                        {value}
+                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
                       </button>
                     </div>
                   ))}

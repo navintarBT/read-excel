@@ -1,0 +1,1115 @@
+.header {
+    background-color: #fff;
+    padding: 10px 20px;
+    border-radius: 15px 15px 0 0;
+    height: auto;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 ;
+  }
+  
+  
+  
+  .logo img {
+    height: 30px;
+  }
+  
+  .menu ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .menu ul li a {
+    color: black;
+    text-decoration: none;
+  }
+  
+  .action {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+  
+  .action .login-btn,
+  .action .signup-btn {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .action .signup-btn {
+    background-color: #22a699;
+  }
+  
+  .table-container {
+    height: calc(100vh - 120px);
+    width: 100%;
+    box-sizing: border-box; 
+    background-color: #f5f5fa;
+  }
+  .upload{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-top: 30px;
+  }
+  
+  .upload h1{
+    color: black;
+  }
+  
+  .upload-btn {
+    background-color: #e5322d;
+    color: white;
+    width: 265px;  
+    height: 55px;  
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 8px;
+  }
+  
+  .send-btn {
+    background-color: #e5322d;
+    color: white;
+    width: 100%;  /* Fixed width */
+    height: 55px;  /* Fixed height */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 8px;
+  }
+  
+  .send-btn:hover {
+    background-color: #e5322d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .send-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  .upload-btn:hover {
+    background-color: #e5322d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .upload-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  .table-container input[type="file"] {
+    margin-bottom: 20px;
+  }
+  
+  .footer {
+    background-color: #fff;
+    padding: 10px 20px;
+    border-radius: 0 0 15px 15px;
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    z-index: 1000;
+    box-sizing: border-box; 
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
+  
+  .footer-copy {
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box; 
+    justify-content: center;
+    color: black;
+  
+  }
+  
+  .content{
+    display: flex;
+    padding: 15px 0 5px 5px;
+    height: calc(100vh - 120px);
+    width: 100%;
+    box-sizing: border-box; 
+  }
+  
+  .send-message {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    width: 20%;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-right: none;
+    border-radius: 0 0 15px 15px;
+    background-color: white;
+  }
+  
+  .show-table{
+    overflow-y: auto; 
+    display: block;
+    width: 80%;
+    height: 100%;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #22a699;
+    margin: 20px 0;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  .amount{
+    color: #22a699;
+  }
+  
+  .send-head{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, .2);
+    height: 80px;
+    
+  }
+  
+  .send-message .send-footer {
+    color: rgb(0, 0, 0);
+    padding: 10px;
+    border-radius: 0 0 15px 15px;
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    bottom: 2%;
+    left: 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid rgba(0, 0, 0, .2);
+  }
+  
+  .table-container.dragging {
+    background-color: rgba(0, 0, 0, 0.5); 
+    transition: background-color 0.3s ease;
+  }
+  
+  .show-table.dragging {
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s ease;
+  }
+  
+  
+  .drag-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .drag-text-table {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  
+  .icon-circle {
+    width: 55px;
+    height: 55px;
+    background-color: #e5322d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    transition: all 0.3s ease;
+    outline: none;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .icon-circle svg {
+    color: white;
+    font-size: 20px;
+  }
+  
+  .icon-circle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(229, 50, 45, 0.3);
+  }
+  
+  .icon-circle:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%; /* Position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s;
+    max-width: 200px; /* Ensure tooltip stays within viewport */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .icon-circle:hover::after {
+    opacity: 1;
+  }
+  
+  .send-body {
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+    height: 65%;
+    width: 100%;
+    gap: 7%;
+  }
+  
+  .send-body-list{
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+    height: 15%;
+    width: 100%;
+    gap: 7%;
+  }
+  
+  .btn-add{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    gap: 15px; 
+    margin-top: 5px;
+  }
+  
+  .btn-cancel-add{
+    background-color: #e5322d;
+    color: white;
+    width: 100%;  
+    height: 45px;  
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 8px;
+  
+    }
+  
+    .btn-cancel-add:hover {
+      background-color: #e5322d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-cancel-add:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+  
+    .btn-save-add{
+      background-color: #22a699;
+      color: white;
+      width: 100%;  
+      height: 45px; 
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      gap: 8px;
+  
+    }
+  
+    .btn-save-add:hover {
+      background-color: #22a699;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-save-add:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .textarea{
+      border-radius: 4px;
+      border: 1px solid #22a699;
+      outline: none;
+      resize: none;
+      background-color: #ffffff;
+      margin-left: 5px;
+      margin-right: 5px;
+      height: 100%;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+  .textarea-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+  }
+  
+  .logo img{
+    height: 45px;
+    width: 50px;
+  }
+  
+  .list-message{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 10px;
+  }
+  
+  
+  .btn-list{
+    background-color: #22a699;
+    color: white;
+    width: 100%;  
+    height: 120px; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    gap: 8px;
+  }
+  
+  .btn-list:hover {
+    background-color: #22a699;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .btn-list:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  
+  .message-name{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message-name input{
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #22a699;
+  }
+  
+  .message-name-content{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message-item-container {
+    flex-direction: column;
+    justify-content: center;
+    height: 38%;
+    width: 100%;
+    overflow-y: auto;
+  }
+  
+  .message-item {
+  padding-bottom: 5px;
+  }
+  
+  .action-container button {
+      background-color: #22a699;
+      color: white;
+      width: 100%;  
+      height: 40px; 
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      gap: 8px;
+    
+    }
+  
+    .action-container{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
+    }
+  
+    .control-checked{
+      height: 15px;
+      width: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      border: 1px solid #22a699;
+    }
+  
+    .icon-checked{
+      color: #22a699;
+    }
+  
+    .icon-delete{
+      color: #e5322d;
+    }
+  
+    .icon-edit{
+      color: #22a699;
+    }
+  
+    .dropdown-container{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+  
+    .spinner-overlay {
+      position: fixed; /* Makes it cover the entire screen */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+      z-index: 9999; /* Ensure it stays above all other elements */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .spinner {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner-border {
+      color: #007bff;
+    }
+    
+    .spinner-overlay {
+      position: fixed; /* Makes it cover the entire screen */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+      z-index: 9999; /* Ensure it stays above all other elements */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .spinner {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner-border {
+      color: #007bff;
+    }
+    
+    .loading {
+      font-size: 14px;
+      color: #333;
+      margin-top: 10px;
+    }
+  
+    .invalid-phone {
+      background-color:#e5322d;
+    }
+  
+    .selected-phone-number{
+      display: flex;
+      gap: 5px;
+      flex-direction: column;
+      padding: 10px;
+    }
+  
+    .select-phone{
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .select-phone button{
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      width: 100%;
+    }
+  
+    .dropdown-phone-container{
+      padding: 10px 10px 0 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+  
+    .select-phone-control{
+      display: flex;
+      flex-direction: column;
+      height: 87px;
+      gap: 4px;
+      overflow: auto;
+    }
+  
+    .choice-send{
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .amount-send h1,h3{
+      margin: 0;
+    }
+  
+    .amount-send{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  
+    .radio-button{
+      cursor: pointer;
+      font-weight:bold ;
+      color: #242424;
+    }
+  
+    .radio-button.selected {
+      color: #22a699;
+    }
+    .dropdown-select {
+      padding: 7px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #333;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    
+    .dropdown-select:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+  
+    button:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+  
+    .empty-phone {
+      background-color: #e5322d; 
+    }
+  
+    .add-message-list{
+      display: flex;
+      justify-content: right;
+      padding: 0 10px 0 0;
+    }
+  
+    .icon-add-message {
+      width: 30px;
+      height: 30px;
+      background-color: #e5322d;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+      transition: all 0.3s ease;
+      outline: none;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .icon-add-message svg {
+      color: white;
+      font-size: 20px;
+    }
+    
+    .icon-add-message:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(229, 50, 45, 0.3);
+    }
+    
+    .icon-add-message::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 50%;
+      right: 110%; 
+      transform: translateY(-50%); 
+      background-color: #333;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none; 
+      font-size: 14px
+  }
+  
+  .icon-add-message:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(-5px); 
+  }
+  
+  @media (max-width: 1024px) {
+    nav {
+      padding: 0 10px;
+    }
+    .footer-copy {
+      padding: 0 10px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin: 15px 0;
+    }
+    .amount-send h1{
+      font-size: 25px;
+    }
+    .amount-send h3{
+      font-size: 16px;
+    }
+  
+    .btn-list{
+      height: 100px; 
+      font-size: 18px;
+      gap: 8px;
+    }
+  
+    .send-btn {
+      font-size: 16px;
+      height: 45px;
+    }
+    .icon-circle {
+      width: 48px;
+      height: 48px;
+    }
+  
+    .icon-add-message {
+      width: 25px;
+      height: 25px;
+      font-size: 12px;
+      margin: 5px;
+    }
+    
+    .icon-add-message svg {
+      color: white;
+      font-size: 17px;
+    }
+  
+    .action-container button {
+      height: 35px; 
+      font-size: 14px;
+    }
+  
+    .choice-send{
+      gap: 10px;
+      font-size: 12px;
+    }
+    .dropdown-phone-container label{
+      font-size: 12px;
+    }
+    .selected-phone-number label{
+      font-size: 12px;
+    }
+  
+    .dropdown-select {
+      padding: 5px;
+      font-size: 14px;
+    }
+  
+    .message-item-container {
+      height: 34%;
+    }
+    .select-phone button{
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+  
+  }
+  
+  @media (min-resolution: 1.25dppx) { 
+    .header {
+      padding: 5px 10px  6px 10px;
+      font-size: 14px;
+    }
+    nav {
+      padding: 0 10px;
+    }
+  
+    .footer {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .content{
+      display: flex;
+      padding: 0 0 2px 5px;
+      height: calc(100vh - 120px);
+      width: 100%;
+      box-sizing: border-box; 
+    }
+  
+    table th, table td {
+      border: 10px solid #ddd;
+      text-align: left;
+    }
+    .amount-send h1{
+      font-size: 30px;
+    }
+  
+    .send-body-list{
+      margin-top: 5%;
+      display: flex;
+      justify-content: center;
+      height: 15%;
+      width: 100%;
+      gap: 7%;
+    }
+  
+    .icon-circle {
+      width: 40px;
+      height: 40px;
+    }
+    .icon-circle:hover::after {
+  font-size: 10px;
+    }
+  
+    .list-message{
+      gap: 40px;
+    }
+  
+    .btn-list{
+      height: 100px; 
+      gap: 5px;
+      font-size: 20px;
+    }
+  
+    .send-btn {
+  
+      height: 40px;
+    }
+  
+    .icon-add-message {
+      width: 25px;
+      height: 25px;
+      font-size: 5px;
+      margin: 5px;
+    }
+    
+    .icon-add-message svg {
+      color: white;
+      font-size: 15px;
+    }
+  
+    .icon-add-message::after {
+      font-size: 12px
+  }
+  .action-container button {
+    height: 30px; 
+    font-size: 12px;
+  }
+  .message-item{
+    padding: 0;
+  }
+  
+  .dropdown-phone-container label{
+    font-size: 13px;
+  
+  }
+  
+  .dropdown-select {
+    padding: 5px;
+    font-size: 12px;
+  }
+  
+  .choice-send{
+    gap: 10px;
+    font-size: 12px;
+  }
+  
+  .selected-phone-number label{
+    font-size: 12px;
+  }
+  
+  .selected-phone-number {
+    padding: 0 10px 0 10px;
+  }
+  
+  .message-item-container {
+    height: 35%;
+  }
+  
+  .select-phone button{
+  font-size: 12px;
+  }
+  
+  .btn-add{
+    gap: 10px; 
+  }
+  .btn-add button{
+    height: 35px;
+  }
+  .send-head h1 {
+    font-size: 30px;
+  }
+  
+  .textarea-container h2{
+    font-size: 20px;
+  }
+  .select-phone .control-checked{
+    width: 20px;
+  
+  }
+  }
+  
+  @media (min-resolution: 1.10dppx) { 
+    .header {
+      padding: 5px 10px  6px 10px;
+      font-size: 14px;
+    }
+    nav {
+      padding: 0 10px;
+    }
+  
+    .footer {
+      display: flex;
+      padding: 5px 10px;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .content{
+      display: flex;
+      padding: 0 0 2px 5px;
+      height: calc(100vh - 120px);
+      width: 100%;
+      box-sizing: border-box; 
+    }
+  
+    table th, table td {
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    .amount-send h1{
+      font-size: 30px;
+    }
+  
+    .send-body-list{
+      margin-top: 5%;
+      display: flex;
+      justify-content: center;
+      height: 15%;
+      width: 100%;
+      gap: 7%;
+    }
+  
+    .icon-circle {
+      width: 40px;
+      height: 40px;
+    }
+    .icon-circle:hover::after {
+  font-size: 10px;
+    }
+  
+    .list-message{
+      gap: 40px;
+    }
+  
+    .btn-list{
+      height: 100px; 
+      gap: 5px;
+      font-size: 20px;
+    }
+  
+    .send-btn {
+  
+      height: 40px;
+    }
+  
+    .icon-add-message {
+      width: 25px;
+      height: 25px;
+      font-size: 5px;
+      margin: 5px;
+    }
+    
+    .icon-add-message svg {
+      color: white;
+      font-size: 15px;
+    }
+  
+    .icon-add-message::after {
+      font-size: 12px
+  }
+  .action-container button {
+    height: 30px; 
+    font-size: 12px;
+  }
+  .message-item{
+    padding: 0;
+  }
+  
+  .dropdown-phone-container label{
+    font-size: 13px;
+  
+  }
+  
+  .dropdown-select {
+    padding: 5px;
+    font-size: 12px;
+  }
+  
+  .choice-send{
+    gap: 10px;
+    font-size: 12px;
+  }
+  
+  .selected-phone-number label{
+    font-size: 12px;
+  }
+  
+  .selected-phone-number {
+    padding: 0 10px 0 10px;
+  }
+  
+  .message-item-container {
+    height: 35%;
+  }
+  
+  .select-phone button{
+  font-size: 12px;
+  }
+  
+  .btn-add{
+    gap: 10px; 
+  }
+  .btn-add button{
+    height: 35px;
+  }
+  .send-head h1 {
+    font-size: 30px;
+  }
+  
+  .textarea-container h2{
+    font-size: 20px;
+  }
+  }
+  
