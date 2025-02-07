@@ -8,29 +8,36 @@ import logo from '../logo/systory_logo_final-1-e1578037567378.png';
 import Swal from 'sweetalert2';
 
 const ReadExcel = () => {
-  const [data, setData] = useState([]);
-  const [headers, setHeaders] = useState([]);
-  const fileInputRef = useRef(null);
-  const [showUpload, setShowUpload] = useState(true);
+  //event page
+  const [selectChoice, setSelectChoice] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
   const [showPageInitial, setShowPageInitial] = useState(false);
   const [showSendMessage, setShowSendMessage] = useState(false);
   const [showSendMessenger, setShowSendMessenger] = useState(false);
-  const [showCreatePromptPage, setShowCreatePromptPage] = useState(false);
-  const [showCreatePromptPage, setShowCreatePromptPage] = useState(false);
-  const [showCreatePromptPage, setShowCreatePromptPage] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isDraggingShow, setIsDraggingShow] = useState(false);
   const [showCreateMessage, setShowCreateMessage] = useState(false);
   const [showCreateTemplate, setShowCreateTemplate] = useState(false);
-  const [showListTemplate, setShowListTemplate] = useState(false);
+  const [showCreatePromptPage, setShowCreatePromptPage] = useState(false);
   const [showListMessage, setShowListMessage] = useState(false);
+  const [showListTemplate, setShowListTemplate] = useState(false);
+  const [showMessengerTemplateList, setShowMessengerTemplateList] = useState(false);
+  const [showMessengerMessageList, setShowMessengerMessageList] = useState(false);
+
+  //state normal
+  const [data, setData] = useState([]);
+  const [headers, setHeaders] = useState([]);
+  const fileInputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingShow, setIsDraggingShow] = useState(false);
   const [messageToEdit, setMessageToEdit] = useState(null);
+  const [messengerToEdit, setMessengerToEdit] = useState(null);
   const [templateToEdit, setTemplateToEdit] = useState(null);
   const [showContent, setShowContent] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [invalidPhoneNumbers, setInvalidPhoneNumbers] = useState([]);
   const [indexColumn, setIndexColumn] = useState(null);
   const [phoneNumberEmpty, setPhoneNumberEmpty] = useState([]);
+  const [optionSend, setOptionSend] = useState(false);
+  const [dataPage, setDatapage] = useState(null);
   const [getAmountSend, setGetAmountSend] = useState(parseInt(localStorage.getItem('amountSend'), 10) || 0);
   const today = new Date().toISOString().split('T')[0];
   const lastDate = localStorage.getItem('lastUpdateDate') || '';
@@ -39,8 +46,6 @@ const ReadExcel = () => {
     localStorage.setItem('amountSend', 0);
     localStorage.setItem('lastUpdateDate', today); 
   }
-
-  console.log(window.devicePixelRatio); 
 
   const handleFileUpload = (file) => {
     const validExtensions = ['xlsx', 'xls', 'csv'];
@@ -55,11 +60,18 @@ const ReadExcel = () => {
     return;
   }
     const reader = new FileReader();
+    if(optionSend == true){
+      setShowSendMessage(false);
+      setShowPageInitial(true);
+    }else{
+      setShowSendMessage(true);
+      setShowPageInitial(false);
+
+    }
+
+    setShowContent(true);
     setShowUpload(false);
     setShowCreateMessage(false);
-    setShowPageInitial(true);
-    setShowContent(true);
-    setShowSendMessage(false);
     setShowCreateTemplate(false);
     setShowListMessage(false);
     setShowListTemplate(false);
@@ -109,6 +121,21 @@ const ReadExcel = () => {
       fileInputRef.current.click();
     }
   };
+  const handleToggleSendMessage = (e) => {
+    setOptionSend(e === true);
+    setSelectChoice(false);
+    setShowUpload(true);
+    setShowPageInitial(false);
+    setShowSendMessage(false);
+    setShowSendMessenger(false);
+    setShowCreateMessage(false);
+    setShowCreateTemplate(false);
+    setShowCreatePromptPage(false);
+    setShowListMessage(false);
+    setShowListTemplate(false);
+    setShowMessengerTemplateList(false);
+    setShowMessengerMessageList(false);
+  }
 //3 nhar sa mart sai nam kun dai
   const handleToggleMessage = () => {
     setShowCreateMessage(true);
@@ -149,15 +176,10 @@ const ReadExcel = () => {
     setShowListTemplate(false);
     
   };
-
+//111
   const handleToggleSendWhatsapp = (e) => {
-    if(e==true) {
     setShowSendMessenger(true);
     setShowSendMessage(false);
-    }else{
-    setShowSendMessage(true);
-    setShowSendMessenger(false);
-    }
     setShowCreateMessage(false);
     setShowCreateTemplate(false);
     setShowListMessage(false);
@@ -165,6 +187,7 @@ const ReadExcel = () => {
     setShowUpload(false)
     setShowContent(true)
     setShowPageInitial(false);
+    setDatapage(e)
 
   };
 
@@ -193,6 +216,16 @@ const ReadExcel = () => {
     setShowListTemplate(true);
   };
 
+  const handleToggleSavePage = () => {
+    setShowCreateTemplate(false);
+    setShowSendMessage(false);
+    setShowCreateMessage(false);
+    setShowListMessage(false);
+    setShowListTemplate(false);
+    setShowPageInitial(true);
+    setShowCreatePromptPage(false)
+  };
+
   const handleToggleCancel = () => {
     setShowCreateTemplate(false);
     setShowSendMessage(true);
@@ -217,6 +250,28 @@ const ReadExcel = () => {
     setShowListMessage(status);
   };
 
+  const handleToggleMessengerTemplateList = () => {
+    setShowCreateTemplate(false);
+    setShowCreateMessage(false);
+    setShowListMessage(false);
+    setShowSendMessage(false);
+    setShowListTemplate(false);
+    setShowMessengerTemplateList(true);
+    setShowPageInitial(false);
+    setShowSendMessenger(false);
+  };
+
+  const handleToggleMessengerMessageList = () => {
+    setShowCreateTemplate(false);
+    setShowSendMessage(false);
+    setShowCreateMessage(false);
+    setShowListTemplate(false);
+    setShowListMessage(false);
+    setShowMessengerMessageList(true);
+    setShowPageInitial(false);
+    setShowSendMessenger(false);
+  };
+
   const handleEditMessage = (message) => {
     setMessageToEdit(message);
     setShowCreateTemplate(false);
@@ -224,6 +279,17 @@ const ReadExcel = () => {
     setShowCreateMessage(true);
     setShowListTemplate(false);
     setShowListMessage(false);
+  };
+
+  const handleEditMessenger = (page) => {
+    setMessengerToEdit(page);
+    setShowCreateTemplate(false);
+    setShowSendMessage(false);
+    setShowCreateMessage(false);
+    setShowListTemplate(false);
+    setShowListMessage(false);
+    setShowCreatePromptPage(true);
+    setShowPageInitial(false);
   };
 
   const handleEditTemplate = (message) => {
@@ -271,13 +337,17 @@ const ReadExcel = () => {
       setIsDraggingShow(false)
     }
   };
-
+//3 to nee sai nam kun dai
   const clearMessageToEdit = () => {
     setMessageToEdit(null);
   };
 
   const clearTemplateToEdit = () => {
     setTemplateToEdit(null);
+  };
+
+  const clearMessengerToEdit = () => {
+    setMessengerToEdit(null);
   };
 //333
   const checkPhoneInvalid = async (ids,indexColumn,emptyIndexes) => {
@@ -346,6 +416,11 @@ const ReadExcel = () => {
         onDragLeave={handleDragLeave}
       >
         {isDragging && <div className="drag-text">Please drop Excel file</div>}
+        {selectChoice && (
+          <SelectChoice
+            onClick={handleToggleSendMessage}
+          />
+        )}
         {showUpload && (
           <UploadSection
             onClick={handleButtonClick}
@@ -386,16 +461,18 @@ const ReadExcel = () => {
         </div>
           {showPageInitial && (
           <PageInitial
-          onClick={handleButtonClick}
-          fileInputRef={fileInputRef}
-          onFileUpload={(e) => handleFileUpload(e.target.files[0])}
-          onToggleTemplateList={handleToggleTemplateList}
-          onToggleMessageList={handleToggleMessageList}
+          onToggleMessageList={handleToggleMessengerMessageList}
+          handleEditMessenger={handleEditMessenger}
+          headers={headers}
+          data={data}
+          checkPhoneInvalid={checkPhoneInvalid}
+          SpinnerComponent={spinnerComponent}
+          setIndexColumn={setIndexColumn}
+          setGetAmountSend={setGetAmountSend}
           getAmountSend={getAmountSend}
-          handleToggleBackHome={handleToggleBackHome}
+          setPhoneNumberEmpty={setPhoneNumberEmpty}
+          onToggleMessage={handleTogglePromptPage}
           handleToggleSendWhatsapp={handleToggleSendWhatsapp}
-          onToggleMessage={handleToggleMessage}
-          onToggleTemplate={handleToggleTemplate}
             />
           )}
           {showSendMessage && (
@@ -418,8 +495,8 @@ const ReadExcel = () => {
           onFileUpload={(e) => handleFileUpload(e.target.files[0])}
           onToggleMessage={handleToggleMessage}
           onToggleTemplate={handleToggleTemplate}
-          onToggleTemplateList={handleToggleTemplateList}
-          onToggleMessageList={handleToggleMessageList}
+          onToggleTemplateList={handleToggleMessengerTemplateList}
+          onToggleMessageList={handleToggleMessengerMessageList}
           getAmountSend={getAmountSend}
           handleToggleBackHome={handleToggleBackHome}
           handleTogglePromptPage={handleTogglePromptPage}
@@ -441,10 +518,10 @@ const ReadExcel = () => {
           />}
            {showCreatePromptPage && 
           <CreatePromptPage
-          onToggleSave ={handleToggleSaveTemplate} 
+          onToggleSave ={handleToggleSavePage} 
           onToggleCancel ={handleToggleCancel} 
-          templateToEdit={templateToEdit}
-          clearTemplateToEdit={clearTemplateToEdit}
+          messengerToEdit={messengerToEdit}
+          clearMessengerToEdit={clearMessengerToEdit}
           />}
            {showListMessage && 
           <MessageList
@@ -475,6 +552,37 @@ const ReadExcel = () => {
           setPhoneNumberEmpty={setPhoneNumberEmpty}
           onToggleTemplate={handleToggleTemplate}
           />}
+            {showMessengerTemplateList && 
+          <MessengerTemplateList
+          onToggleTemplateList={handleToggleMessengerTemplateList}
+          onEditTemplate={handleEditTemplate}
+          headers={headers}
+          data={data}
+          checkPhoneInvalid={checkPhoneInvalid}
+          SpinnerComponent={spinnerComponent}
+          setIndexColumn={setIndexColumn}
+          setGetAmountSend={setGetAmountSend}
+          getAmountSend={getAmountSend}
+          setPhoneNumberEmpty={setPhoneNumberEmpty}
+          onToggleTemplate={handleToggleTemplate}
+          dataPage={dataPage}
+          />}
+          {showMessengerMessageList && 
+          <MessengerMessageList
+          onToggleMessageList={handleToggleMessengerMessageList}
+          handleEditMessenger={handleEditMessenger}
+          headers={headers}
+          data={data}
+          checkPhoneInvalid={checkPhoneInvalid}
+          SpinnerComponent={spinnerComponent}
+          setIndexColumn={setIndexColumn}
+          setGetAmountSend={setGetAmountSend}
+          getAmountSend={getAmountSend}
+          setPhoneNumberEmpty={setPhoneNumberEmpty}
+          onToggleMessage={handleToggleMessage}
+          dataPage={dataPage}
+          />}
+          
         </div>)}
       </div>
       <Footer />
@@ -503,6 +611,21 @@ const Header = () => (
   </header>
 );
 
+const SelectChoice = ({ onClick }) => (
+  <div className='select-choice'>
+    <h1>Select For Send</h1>
+    <h2>Please select a choice to send a message </h2>
+    <div className='messenger-whatsapp'>
+    <button className="messenger" onClick={()=>onClick(true)}>
+        <FontAwesomeIcon icon={faFacebookMessenger} /> <br />Messenger
+    </button>
+    <button className="whatsapp" onClick={()=>onClick(false)}>
+        <FontAwesomeIcon icon={faWhatsapp} /> <br /> WhatsApp
+    </button>
+    </div>
+  </div>
+);
+
 const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
   <div className='upload'>
     <h1>Send Message</h1>
@@ -517,42 +640,6 @@ const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
       style={{ display: 'none' }}
       onChange={onFileUpload}
     />
-  </div>
-);
-
-const PageInitial = ({onClick, fileInputRef, onFileUpload,getAmountSend,handleToggleBackHome,handleToggleSendWhatsapp }) => (
-  <div className="send-message">
-    <div className="send-head">
-    <div className='amount-send'>
-      <h2>Send Message</h2>
-      <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
-      </div>
-    </div>
-    <div className="send-body-list">
-      <div className="icon-circle" onClick={onClick} data-tooltip="Add new file">
-        <FontAwesomeIcon icon={faPlus} />
-      </div>
-      <input
-        type="file"
-        accept=".xlsx, .xls"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        onChange={onFileUpload}
-      />
-    </div>
-    <div className='list-message'>
-    <button className="btn-list" onClick={() =>handleToggleSendWhatsapp(true)}>
-    Messenger <FontAwesomeIcon icon={faFacebookMessenger} /> 
-  </button>
-  <button className="btn-list" onClick={handleToggleSendWhatsapp}>
-     Whatsapp <FontAwesomeIcon icon={faWhatsapp} />
-  </button>
-  <button className="send-btn" onClick={() => handleToggleBackHome(true)}>
-      <FontAwesomeIcon icon={faArrowLeft}  />Back To Home
-  </button>
-    </div>
-    <div className="send-footer">
-    </div>
   </div>
 );
 
@@ -1041,122 +1128,84 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
-  // const handleSave = async () => {
-
-  //   if (!sendTemplate || !selectedData) {
-  //     Swal.fire({
-  //       icon: 'warning',
-  //       title: 'Warning',
-  //       text: 'Selected data and template cannot be empty.',
-  //     });
-  //     return;
-  //   }
-  //   if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Error',
-  //       text: 'Please select a phone number.',
-  //     });
-  //     return;
-  //   }
-  //   const emptyIndexes = selectedData
-  //   .map((item, index) => (item === "" ? index : -1))
-  //   .filter(index => index !== -1);
-
-  //   setPhoneNumberEmpty([])
-  //   setIndexColumn(null)
-  //   SpinnerComponent(true);
-  //   let getId = [];
-  //   const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-  //     const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-  //     const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
-  //     if (dataItem) {
-  //       var myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-  //       var urlencoded = new URLSearchParams();
-  //       urlencoded.append("token", "uwetp05gfbbjkc2g");
-  //       urlencoded.append("to", `+85620${dataItem}`);
-  //       urlencoded.append("body", `${template}`);
-  //       var requestOptions = {
-  //         method: 'POST',
-  //         headers: myHeaders,
-  //         body: urlencoded,
-  //         redirect: 'follow'
-  //       };
-
-  //       return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
-  //         .then(response => response.json())
-  //         .then(result => {
-  //           getId.push(result.id);
-  //         })
-  //         .catch(error => {
-  //           Swal.fire({
-  //             icon: 'error',
-  //             title: 'Error',
-  //             text: error,
-  //           });
-  //         });
-  //     }
-  //     return Promise.resolve();
-  //   });
-
-  //   await Promise.all(fetchPromises);
-  //   setTimeout(async () => {
-  //     const count = getId.length;
-  //     localStorage.setItem('amountSend', getAmountSend + count);
-  //     setGetAmountSend(getAmountSend + count);
-  //     if(selectedRadioOption === 'selectSend'){
-  //     await checkPhoneInvalid(getId, indexCol,[]);
-  //     }else{
-  //     await checkPhoneInvalid(getId, indexCol,emptyIndexes);
-  //     }
-  //     SpinnerComponent(false);
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: 'Success',
-  //       text: 'Template have been sent successfully.',
-  //     });
-  //   }, 5000);
-  // };
-
   const handleSave = async () => {
-    const accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbl9zZXNzaW9uIjpudWxsLCJmYl9uYW1lIjoiTidUYXIgTmF2aW4iLCJmYl9pZCI6IjI1MTIzNTU3OTk5NTg5MyIsImlhdCI6MTczODU3NjQ3NCwic2Vzc2lvbl9pZCI6IlROYytZL0xTVTdQK1hqZEhWWDFPVW1XOHgrMFBrbWhxSTVLN0M0a09RcGMiLCJ1aWQiOiI1NTlkNjNkOC1kYzg1LTQzZDEtOGExZS03Njc1MGVhYjRhYzMiLCJhcHBsaWNhdGlvbiI6MSwiZXhwIjoxNzQ2MzUyNDc0LCJuYW1lIjoiTidUYXIgTmF2aW4ifQ.C9vjRHZf6pAk89EUUiIWOaw30yYHJThUqNVPkDZNAQU";
-    const pageId = "104102788235946";
-    const conversationId = "104102788235946_9449963831709835";
-    const url = `https://pages.fm/api/v1/pages/${pageId}/conversations/${conversationId}/messages?access_token=${accessToken}&&action=reply_inbox`;
-  
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: "message from template",
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to send message",
-        }));
-        throw new Error(errorData.message || "Failed to send message");
-      }
-  
-      const result = await response.json();
-      console.log("✅ Success:", result);
-      Swal.fire("Success!", "Message sent!", "success");
-    } catch (error) {
-      console.error("❌ Error:", error);
+
+    if (!sendTemplate || !selectedData) {
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "An unexpected error occurred.",
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Selected data and template cannot be empty.',
       });
+      return;
     }
+    if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please select a phone number.',
+      });
+      return;
+    }
+    const emptyIndexes = selectedData
+    .map((item, index) => (item === "" ? index : -1))
+    .filter(index => index !== -1);
+
+    setPhoneNumberEmpty([])
+    setIndexColumn(null)
+    SpinnerComponent(true);
+    let getId = [];
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
+      if (dataItem) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("token", "uwetp05gfbbjkc2g");
+        urlencoded.append("to", `+85620${dataItem}`);
+        urlencoded.append("body", `${template}`);
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: urlencoded,
+          redirect: 'follow'
+        };
+
+        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            getId.push(result.id);
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error,
+            });
+          });
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(fetchPromises);
+    setTimeout(async () => {
+      const count = getId.length;
+      localStorage.setItem('amountSend', getAmountSend + count);
+      setGetAmountSend(getAmountSend + count);
+      if(selectedRadioOption === 'selectSend'){
+      await checkPhoneInvalid(getId, indexCol,[]);
+      }else{
+      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+      }
+      SpinnerComponent(false);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Template have been sent successfully.',
+      });
+    }, 5000);
   };
-  
-  
+
   const handleCancel = () => {
     onToggleTemplateList(false);
   };
@@ -1346,7 +1395,95 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   );
 };
 //-------------------------------------Messenger sole---------------------------------
+const PageInitial = ({ onToggleMessageList, handleEditMessenger,getAmountSend,onToggleMessage,handleToggleSendWhatsapp }) => {
+  const [existingMessage, setExistingMessage] = useState(() => {
+  const storedMessages = localStorage.getItem('page');
+  return storedMessages ? JSON.parse(storedMessages).reverse() : [];
+  });
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [selectedPage, setSelectedPage] = useState(null);
+  const handleSave = async () => {
+    if(!selectedPage){
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Please select a page.',
+      });
+      return;
+    }
+    handleToggleSendWhatsapp(selectedPage);
+  };
 
+  const handleCancel = () => {
+    onToggleMessageList(false);
+  };
+
+  const handleSelectMessage = (index, template) => {
+    if (selectedMessage === index) {
+      setSelectedMessage(null);
+      setSelectedPage(null);
+      return;
+    }
+    setSelectedPage(template);
+    setSelectedMessage(index);
+  };
+
+  const handleEdit = (index) => {
+    const pageToEdit = existingMessage[index];
+    handleEditMessenger(pageToEdit);
+  };
+
+  const handleDelete = (index) => {
+    const updatedTemplates = existingMessage.filter((_, i) => i !== index);
+    localStorage.setItem('page', JSON.stringify(updatedTemplates.reverse()));
+    setExistingMessage(updatedTemplates.reverse()); 
+    setSelectedMessage(null);
+  };
+
+  return (
+    <div className="send-message">
+      <div className="send-head">
+        <div className='amount-send'>
+        <h2>Message List</h2>
+        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        </div>
+      </div> 
+      <div className='add-message-list'>
+      <div className="icon-add-message" onClick={onToggleMessage}data-tooltip="Add Page">
+          <FontAwesomeIcon icon={faPlus} />
+        </div>
+      </div>
+      <div className="message-item-container">
+        {existingMessage.map((template, index) => (
+          <div key={index} className="message-item">
+            <div className="action-container">
+              <div className="control-checked"onClick={() => handleSelectMessage(index,template)}>
+                {selectedMessage === index && (
+                  <div className="icon-checked">
+                    <FontAwesomeIcon icon={faCheck} />
+                  </div>
+                )}
+              </div>
+              <button value={template.template} onClick={() => handleSelectMessage(index,template)}>
+                {template.name.length > 22 ? `${template.name.slice(0, 22)}...` : template.name}
+              </button>
+              <div className="icon-edit" onClick={() => handleEdit(index)}>
+                <FontAwesomeIcon icon={faEdit} />
+              </div>
+              <div className="icon-delete" onClick={() => handleDelete(index)}>
+                <FontAwesomeIcon icon={faTrash} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className='btn-add'>
+        <button className='btn-save-add' onClick={handleSave}>Confirm Page<FontAwesomeIcon icon={faPaperPlane}/></button>
+        <button className='btn-cancel-add' onClick={handleCancel}>Back</button>
+      </div>
+    </div>
+  );
+};
 const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, onToggleTemplate,
   onToggleMessageList,onToggleTemplateList,getAmountSend,handleToggleBackHome,handleTogglePromptPage }) => (
     <div className="send-message">
@@ -1393,15 +1530,16 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
     </div>
 );
 
-const CreatePromptPage = ({onToggleSave,onToggleCancel,templateToEdit,clearTemplateToEdit}) => { 
-  const [template, setTemplate] = useState(templateToEdit? templateToEdit.template : '');
-  const [templateName, setTemplateName] = useState(templateToEdit? templateToEdit.name : '');
-  const title = templateToEdit
-  ? { header: 'Update Prompt Page', button: 'Update Prompt Page', title: 'Update your Prompt Page'}
-  : { header: 'Add Prompt Page', button: 'Save Prompt Page',title: 'Create your Prompt Page'};
+const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearMessengerToEdit}) => { 
+  const [pageName, setPageName] = useState(messengerToEdit? messengerToEdit.name : '');
+  const [pageId, setPageId] = useState(messengerToEdit? messengerToEdit.pageId : '');
+  const [accessToken, setAccessToken] = useState(messengerToEdit? messengerToEdit.accessToken : '');
+  const title = messengerToEdit
+  ? { header: 'Update Page', button: 'Update Page', title: 'Update your Page'}
+  : { header: 'Add Page', button: 'Save Page',title: 'Create your Page'};
 
 const handleSave = () => {
-  if (!templateName || !template) {
+  if (!pageName || !pageId || !accessToken) {
     Swal.fire({
       icon: 'warning',
       title: 'Warning',
@@ -1410,18 +1548,19 @@ const handleSave = () => {
     return;
   }
   let templateData = {
-    name: templateName,
-    template: template,
+    name: pageName,
+    pageId: pageId,
+    accessToken: accessToken
   };
   const existingMessages = JSON.parse(localStorage.getItem('page')) || [];
-  const updatedMessages = templateToEdit
-    ? existingMessages.map((msg) => (msg.name === templateToEdit.name ? templateData : msg))
+  const updatedMessages = messengerToEdit
+    ? existingMessages.map((msg) => (msg.name === messengerToEdit.name ? templateData : msg))
     : [...existingMessages, templateData];
 
   try {
-    localStorage.setItem('template', JSON.stringify(updatedMessages));
+    localStorage.setItem('page', JSON.stringify(updatedMessages));
     onToggleSave();
-    clearTemplateToEdit();
+    clearMessengerToEdit();
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
       Swal.fire({
@@ -1434,8 +1573,8 @@ const handleSave = () => {
 };
 
   const handleCancel = () => {
-    templateToEdit? onToggleSave() :onToggleCancel();
-    clearTemplateToEdit();
+    messengerToEdit? onToggleSave() :onToggleSave();
+    clearMessengerToEdit();
   };
   return(
   <div className="send-message">
@@ -1448,15 +1587,15 @@ const handleSave = () => {
     <div className='message-name'>
             <label>Page Name:</label>
             <input type="text"
-            value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)}
+            value={pageName}
+            onChange={(e) => setPageName(e.target.value)}
              />
           </div>
           <div className='message-name'>
             <label>Page ID:</label>
             <input type="text"
-            value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)}
+            value={pageId}
+            onChange={(e) => setPageId(e.target.value)}
              />
           </div>
           <div className='message-name-content'>
@@ -1466,8 +1605,8 @@ const handleSave = () => {
     placeholder="Enter your Access Token here"
      rows="10" 
      cols="50"
-     value={template}
-     onChange={(e) => setTemplate(e.target.value)}
+     value={accessToken}
+     onChange={(e) => setAccessToken(e.target.value)}
      ></textarea>
     </div>
   </div>
@@ -1480,7 +1619,8 @@ const handleSave = () => {
 }
 
 const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleMessage }) => {
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleMessage,dataPage }) => {
+    console.log(dataPage);
   const [existingMessage, setExistingMessage] = useState(() => {
   const storedMessages = localStorage.getItem('messages');
   return storedMessages ? JSON.parse(storedMessages).reverse() : [];
@@ -1496,6 +1636,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
+    console.log(selectedPhoneNumber);
     const emptyIndexes = selectedData
   .map((item, index) => (item === "" ? index : -1))
   .filter(index => index !== -1);
@@ -1519,35 +1660,46 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-      if (dataItem) {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
-        urlencoded.append("to", `+85620${dataItem}`);
-        urlencoded.append("body", `${sendMessage}`);
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: urlencoded,
-          redirect: 'follow'
-        };
-
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
-          .then(response => response.json())
-          .then((result) => {
-            getId.push(result.id);
-          })
-          .catch((error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error,
-            });
-          });
+    let filteredCustomers = [];
+    try {
+      const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
+      const getResponse = await fetch(getData, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!getResponse.ok) {
+        const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
+        throw new Error(errorData.message || "Failed to fetch conversations");
       }
+      const result = await getResponse.json();
+       filteredCustomers = result.conversations
+      .filter(dataFromGet => selectedData.includes(dataFromGet.from.name))
+      .map(dataFromGet => ({ name: dataFromGet.from.name, id: dataFromGet.id }));
+    } catch (error) {
+      return error;
+    }
+    console.log(filteredCustomers);
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : filteredCustomers).map(async (item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+      // if (dataItem) {
+      //   try {
+      //     const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
+      //     const postResponse = await fetch(postData, {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify({ message: sendMessage}),
+      //     });
+      
+      //     if (!postResponse.ok) {
+      //       const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
+      //       throw new Error(errorData.message || "Failed to send message");
+      //     }
+      //     const postResult = await postResponse.json();
+      // } catch (error) {
+      //   return error;
+      // }
+       
+      // }
       return Promise.resolve();
     });
 
@@ -1602,17 +1754,6 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       const selectedData = data.map(row => row[selectedIndex]);
-      const nonNumberValues = selectedData.filter(value => isNaN(value));
-    
-      if (nonNumberValues.length > 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Data',
-          text: 'Selected data must be numbers only.',
-        });
-        setShowRadio(false);
-        return;
-      }
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
@@ -1648,7 +1789,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
         <h2>Message List</h2>
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
-      </div>
+      </div> 
       <div className='add-message-list'>
       <div className="icon-add-message" onClick={onToggleMessage}data-tooltip="Add message">
           <FontAwesomeIcon icon={faPlus} />
@@ -1747,7 +1888,8 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
 };
 //222
 const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleTemplate }) => {
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleTemplate,dataPage }) => {
+    console.log(dataPage);
     const [existingTemplate, setExistingTemplate] = useState(() => {
       const storedTemplate = localStorage.getItem('template');
       return storedTemplate ? JSON.parse(storedTemplate).reverse() : [];
@@ -1761,122 +1903,96 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
   const [selectedRadioOption, setSelectedRadioOption] = useState('sendAll');
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
-  // const handleSave = async () => {
-
-  //   if (!sendTemplate || !selectedData) {
-  //     Swal.fire({
-  //       icon: 'warning',
-  //       title: 'Warning',
-  //       text: 'Selected data and template cannot be empty.',
-  //     });
-  //     return;
-  //   }
-  //   if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Error',
-  //       text: 'Please select a phone number.',
-  //     });
-  //     return;
-  //   }
-  //   const emptyIndexes = selectedData
-  //   .map((item, index) => (item === "" ? index : -1))
-  //   .filter(index => index !== -1);
-
-  //   setPhoneNumberEmpty([])
-  //   setIndexColumn(null)
-  //   SpinnerComponent(true);
-  //   let getId = [];
-  //   const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-  //     const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-  //     const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
-  //     if (dataItem) {
-  //       var myHeaders = new Headers();
-  //       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-  //       var urlencoded = new URLSearchParams();
-  //       urlencoded.append("token", "uwetp05gfbbjkc2g");
-  //       urlencoded.append("to", `+85620${dataItem}`);
-  //       urlencoded.append("body", `${template}`);
-  //       var requestOptions = {
-  //         method: 'POST',
-  //         headers: myHeaders,
-  //         body: urlencoded,
-  //         redirect: 'follow'
-  //       };
-
-  //       return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
-  //         .then(response => response.json())
-  //         .then(result => {
-  //           getId.push(result.id);
-  //         })
-  //         .catch(error => {
-  //           Swal.fire({
-  //             icon: 'error',
-  //             title: 'Error',
-  //             text: error,
-  //           });
-  //         });
-  //     }
-  //     return Promise.resolve();
-  //   });
-
-  //   await Promise.all(fetchPromises);
-  //   setTimeout(async () => {
-  //     const count = getId.length;
-  //     localStorage.setItem('amountSend', getAmountSend + count);
-  //     setGetAmountSend(getAmountSend + count);
-  //     if(selectedRadioOption === 'selectSend'){
-  //     await checkPhoneInvalid(getId, indexCol,[]);
-  //     }else{
-  //     await checkPhoneInvalid(getId, indexCol,emptyIndexes);
-  //     }
-  //     SpinnerComponent(false);
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: 'Success',
-  //       text: 'Template have been sent successfully.',
-  //     });
-  //   }, 5000);
-  // };
-
+  
   const handleSave = async () => {
-    const accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbl9zZXNzaW9uIjpudWxsLCJmYl9uYW1lIjoiTidUYXIgTmF2aW4iLCJmYl9pZCI6IjI1MTIzNTU3OTk5NTg5MyIsImlhdCI6MTczODU3NjQ3NCwic2Vzc2lvbl9pZCI6IlROYytZL0xTVTdQK1hqZEhWWDFPVW1XOHgrMFBrbWhxSTVLN0M0a09RcGMiLCJ1aWQiOiI1NTlkNjNkOC1kYzg1LTQzZDEtOGExZS03Njc1MGVhYjRhYzMiLCJhcHBsaWNhdGlvbiI6MSwiZXhwIjoxNzQ2MzUyNDc0LCJuYW1lIjoiTidUYXIgTmF2aW4ifQ.C9vjRHZf6pAk89EUUiIWOaw30yYHJThUqNVPkDZNAQU";
-    const pageId = "104102788235946";
-    const conversationId = "104102788235946_9449963831709835";
-    const url = `https://pages.fm/api/v1/pages/${pageId}/conversations/${conversationId}/messages?access_token=${accessToken}&&action=reply_inbox`;
-  
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: "message from template",
-        }),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to send message",
-        }));
-        throw new Error(errorData.message || "Failed to send message");
-      }
-  
-      const result = await response.json();
-      console.log("✅ Success:", result);
-      Swal.fire("Success!", "Message sent!", "success");
-    } catch (error) {
-      console.error("❌ Error:", error);
+
+    if (!sendTemplate || !selectedData) {
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "An unexpected error occurred.",
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Selected data and template cannot be empty.',
       });
+      return;
     }
+    
+    if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please select a phone number.',
+      });
+      return;
+    }
+    const emptyIndexes = selectedData
+    .map((item, index) => (item === "" ? index : -1))
+    .filter(index => index !== -1);
+
+    setPhoneNumberEmpty([])
+    setIndexColumn(null)
+    SpinnerComponent(true);
+    let getId = [];
+    let filteredCustomers = [];
+    try {
+      const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
+      const getResponse = await fetch(getData, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!getResponse.ok) {
+        const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
+        throw new Error(errorData.message || "Failed to fetch conversations");
+      }
+      const result = await getResponse.json();
+       filteredCustomers = result.conversations
+      .filter(dataFromGet => selectedData.includes(dataFromGet.from.name))
+      .map(dataFromGet => ({ name: dataFromGet.from.name, id: dataFromGet.id }));
+    } catch (error) {
+      return error;
+    }
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : filteredCustomers).map(async(item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : filteredCustomers.indexOf(item)];
+      if (dataItem) {
+        try {
+            const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
+            const postResponse = await fetch(postData, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message: template}),
+            });
+        
+            if (!postResponse.ok) {
+              const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
+              throw new Error(errorData.message || "Failed to send message");
+            }
+            const postResult = await postResponse.json();
+        } catch (error) {
+          return error;
+        }
+      }
+      
+      return Promise.resolve();
+    });
+
+    await Promise.all(fetchPromises);
+    setTimeout(async () => {
+      const count = getId.length;
+      localStorage.setItem('amountSend', getAmountSend + count);
+      setGetAmountSend(getAmountSend + count);
+      if(selectedRadioOption === 'selectSend'){
+      await checkPhoneInvalid(getId, indexCol,[]);
+      }else{
+      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+      }
+      SpinnerComponent(false);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Template have been sent successfully.',
+      });
+    }, 5000);
   };
-  
-  
+ 
   const handleCancel = () => {
     onToggleTemplateList(false);
   };
@@ -1918,18 +2034,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       const selectedData = data.map(row => row[selectedIndex]);
-      const nonNumberValues = selectedData.filter(value => isNaN(value));
-    
-      if (nonNumberValues.length > 0 ) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Data',
-          text: 'Selected data must be numbers only.',
-        });
-      setShowRadio(false);
-
-        return;
-      }
+      console.log(selectedData);
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);

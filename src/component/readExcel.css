@@ -45,20 +45,6 @@ nav {
   margin-right: 10px;
 }
 
-/* .action .login-btn,
-.action .signup-btn {
-  background-color: #555;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.action .signup-btn {
-  background-color: #22a699;
-} */
-
 .table-container {
   height: calc(100vh - 120px);
   width: 100%;
@@ -71,6 +57,26 @@ nav {
   align-items: center;
   height: 100%;
   padding-top: 30px;
+}
+
+.select-choice{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding-top: 30px;
+
+}
+
+.messenger-whatsapp{
+  display: flex;
+  gap: 40px;
+}
+
+.messenger-whatsapp button{
+height: 250px;
+width: 180px;
+  background-color: #22a699;
 }
 
 .upload h1{
