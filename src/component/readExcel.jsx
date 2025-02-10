@@ -1620,7 +1620,6 @@ const handleSave = () => {
 
 const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
   checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleMessage,dataPage }) => {
-    console.log(dataPage);
   const [existingMessage, setExistingMessage] = useState(() => {
   const storedMessages = localStorage.getItem('messages');
   return storedMessages ? JSON.parse(storedMessages).reverse() : [];
@@ -1636,7 +1635,6 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    console.log(selectedPhoneNumber);
     const emptyIndexes = selectedData
   .map((item, index) => (item === "" ? index : -1))
   .filter(index => index !== -1);
@@ -1672,34 +1670,43 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
         throw new Error(errorData.message || "Failed to fetch conversations");
       }
       const result = await getResponse.json();
-       filteredCustomers = result.conversations
-      .filter(dataFromGet => selectedData.includes(dataFromGet.from.name))
-      .map(dataFromGet => ({ name: dataFromGet.from.name, id: dataFromGet.id }));
+      filteredCustomers = result.conversations.reduce((acc, dataFromGet) => {
+        selectedData.forEach((name) => {
+          if (name === dataFromGet.from.name && !acc.some(item => item.name === name)) {
+            acc.push({ name, id: dataFromGet.id });
+          }
+        });
+        return acc;
+      }, []);
     } catch (error) {
       return error;
     }
-    console.log(filteredCustomers);
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : filteredCustomers).map(async (item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-      // if (dataItem) {
-      //   try {
-      //     const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
-      //     const postResponse = await fetch(postData, {
-      //       method: "POST",
-      //       headers: { "Content-Type": "application/json" },
-      //       body: JSON.stringify({ message: sendMessage}),
-      //     });
+    if (selectedRadioOption === 'selectSend') {
+      filteredCustomers = filteredCustomers
+        .filter(item => selectedPhoneNumber.some(phone => phone.value === item.name))
+        .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name}));
+    }
+    const fetchPromises = filteredCustomers.map(async (item) => {
+      const dataItem = item;
+      if (dataItem) {
+        try {
+          const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
+          const postResponse = await fetch(postData, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: sendMessage}),
+          });
       
-      //     if (!postResponse.ok) {
-      //       const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
-      //       throw new Error(errorData.message || "Failed to send message");
-      //     }
-      //     const postResult = await postResponse.json();
-      // } catch (error) {
-      //   return error;
-      // }
+          if (!postResponse.ok) {
+            const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
+            throw new Error(errorData.message || "Failed to send message");
+          }
+          const postResult = await postResponse.json();
+      } catch (error) {
+        return error;
+      }
        
-      // }
+      }
       return Promise.resolve();
     });
 
@@ -1877,7 +1884,6 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
                 </div>
               </div>
             )}
-           
           </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
@@ -1905,6 +1911,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   
   const handleSave = async () => {
+    console.log(sendTemplate);
 
     if (!sendTemplate || !selectedData) {
       Swal.fire({
@@ -1923,6 +1930,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       });
       return;
     }
+    console.log(selectedPhoneNumber);
     const emptyIndexes = selectedData
     .map((item, index) => (item === "" ? index : -1))
     .filter(index => index !== -1);
@@ -1931,48 +1939,59 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
-    let filteredCustomers = [];
-    try {
-      const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
-      const getResponse = await fetch(getData, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!getResponse.ok) {
-        const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
-        throw new Error(errorData.message || "Failed to fetch conversations");
-      }
-      const result = await getResponse.json();
-       filteredCustomers = result.conversations
-      .filter(dataFromGet => selectedData.includes(dataFromGet.from.name))
-      .map(dataFromGet => ({ name: dataFromGet.from.name, id: dataFromGet.id }));
-    } catch (error) {
-      return error;
-    }
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : filteredCustomers).map(async(item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : filteredCustomers.indexOf(item)];
-      if (dataItem) {
-        try {
-            const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
-            const postResponse = await fetch(postData, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message: template}),
-            });
-        
-            if (!postResponse.ok) {
-              const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
-              throw new Error(errorData.message || "Failed to send message");
-            }
-            const postResult = await postResponse.json();
-        } catch (error) {
-          return error;
-        }
-      }
-      
-      return Promise.resolve();
+  let filteredCustomers = [];
+  try {
+    const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
+    const getResponse = await fetch(getData, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
     });
+    if (!getResponse.ok) {
+      const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
+      throw new Error(errorData.message || "Failed to fetch conversations");
+    }
+    const result = await getResponse.json();
+    filteredCustomers = result.conversations.reduce((acc, dataFromGet) => {
+      selectedData.forEach((name, index) => {
+        if (name === dataFromGet.from.name) {
+          acc.push({ name, id: dataFromGet.id, index });
+        }
+      });
+      return acc;
+    }, []);
+  } catch (error) {
+    return error;
+  }
+
+  if (selectedRadioOption === 'selectSend') {
+    filteredCustomers = filteredCustomers
+      .filter(item => selectedPhoneNumber.some(phone => phone.value === item.name))
+      .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name, index: dataFromGet.index }));
+  }
+
+  const fetchPromises = filteredCustomers.map(async (item) => {
+    const dataItem = item;
+    const template = sendTemplate[dataItem.index];
+    if (dataItem) {
+      try {
+        const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
+        const postResponse = await fetch(postData, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: template }),
+        });
+    
+        if (!postResponse.ok) {
+          const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
+          throw new Error(errorData.message || "Failed to send message");
+        }
+      } catch (error) {
+        return error;
+      }
+    }
+    
+    return Promise.resolve();
+  });
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
@@ -2034,7 +2053,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       const selectedData = data.map(row => row[selectedIndex]);
-      console.log(selectedData);
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
@@ -2170,10 +2188,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     </div>
   );
 };
-
-
-
-
 
 const Footer = () => (
   <div className="footer">
