@@ -38,6 +38,9 @@ const ReadExcel = () => {
   const [phoneNumberEmpty, setPhoneNumberEmpty] = useState([]);
   const [optionSend, setOptionSend] = useState(false);
   const [dataPage, setDatapage] = useState(null);
+  const [statusTemplate, setStatusTemplate] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(false);
+  const [addFromMessenger, setAddFromMessenger] = useState(null);
   const [getAmountSend, setGetAmountSend] = useState(parseInt(localStorage.getItem('amountSend'), 10) || 0);
   const today = new Date().toISOString().split('T')[0];
   const lastDate = localStorage.getItem('lastUpdateDate') || '';
@@ -62,11 +65,14 @@ const ReadExcel = () => {
     const reader = new FileReader();
     if(optionSend == true){
       setShowSendMessage(false);
-      setShowPageInitial(true);
+      if(addFromMessenger == 'addFromMessenger'){
+      setShowPageInitial(false)
+    }else{
+      setShowPageInitial(true)
+      }
     }else{
       setShowSendMessage(true);
       setShowPageInitial(false);
-
     }
 
     setShowContent(true);
@@ -116,11 +122,16 @@ const ReadExcel = () => {
     reader.readAsBinaryString(file);
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (e) => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+    if(e =='addFromMessenger'){
+      setAddFromMessenger('addFromMessenger');
+    }
   };
+
+  //when click select whatsapp and messenger
   const handleToggleSendMessage = (e) => {
     setOptionSend(e === true);
     setSelectChoice(false);
@@ -136,8 +147,12 @@ const ReadExcel = () => {
     setShowMessengerTemplateList(false);
     setShowMessengerMessageList(false);
   }
-//3 nhar sa mart sai nam kun dai
-  const handleToggleMessage = () => {
+//when click create message
+  const handleToggleMessage = (e) => {
+    if(e == true) {
+      setStatusMessage(true);
+    }
+    setShowMessengerMessageList(false)
     setShowCreateMessage(true);
     setShowSendMessage(false);
     setShowCreateTemplate(false);
@@ -160,12 +175,13 @@ const ReadExcel = () => {
 
   const handleToggleBackHome = (e) => {
     if(e == true) {
-    setShowUpload(true);
+    setSelectChoice(true);
+    setShowUpload(false);
     setShowPageInitial(false);
     setShowContent(false);
     }else{
     setShowUpload(false);
-    setShowPageInitial(true);
+    setShowPageInitial(false);
     setShowContent(true);
     }
     setShowSendMessenger(false);
@@ -190,8 +206,24 @@ const ReadExcel = () => {
     setDatapage(e)
 
   };
+  const handleToggleBackPageInitial = () => {
+    setShowSendMessage(false);
+    setShowPageInitial(true);
+    setShowContent(true);
+    setShowUpload(false);
+    setShowCreateMessage(false);
+    setShowCreateTemplate(false);
+    setShowListMessage(false);
+    setShowListTemplate(false);
+    setShowSendMessenger(false);
+  }
 
-  const handleToggleTemplate = () => {
+  const handleToggleTemplate = (e) => {
+      if (e == true) {
+        setStatusTemplate(true);
+      }
+    setShowMessengerTemplateList(false)
+    setShowSendMessenger(false);
     setShowCreateTemplate(true);
     setShowSendMessage(false);
     setShowCreateMessage(false);
@@ -201,19 +233,32 @@ const ReadExcel = () => {
 
   };
 
-  const handleToggleSave = () => {
+  const handleToggleSave = (e) => {
+    if (e == true) {
+    setShowListMessage(false);
+    setShowMessengerMessageList(true);
+    }else{
+    setShowListMessage(true);
+    setShowMessengerMessageList(false);
+    }
+
     setShowCreateTemplate(false);
     setShowSendMessage(false);
     setShowCreateMessage(false);
-    setShowListMessage(true);
   };
 
-  const handleToggleSaveTemplate = () => {
+  const handleToggleSaveTemplate = (e) => {
+    if (e == true) {
+    setShowListTemplate(false);
+    setShowMessengerTemplateList(true);
+    }else{
+    setShowListTemplate(true);
+    setShowMessengerTemplateList(false);
+    }
     setShowCreateTemplate(false);
     setShowSendMessage(false);
     setShowCreateMessage(false);
     setShowListMessage(false);
-    setShowListTemplate(true);
   };
 
   const handleToggleSavePage = () => {
@@ -226,12 +271,28 @@ const ReadExcel = () => {
     setShowCreatePromptPage(false)
   };
 
-  const handleToggleCancel = () => {
-    setShowCreateTemplate(false);
+  const handleToggleCancel = (e) => {
+    if (e == true) {
+    setShowSendMessage(false);
+    setShowSendMessenger(true);
+    }else{
     setShowSendMessage(true);
+    setShowSendMessenger(false);
+    }
+    setShowCreateTemplate(false);
     setShowCreateMessage(false);
     setShowListMessage(false);
     setShowListTemplate(false);
+  };
+
+  const handleToggleCancelCreatePage = () => {
+    setShowSendMessage(false);
+    setShowSendMessenger(true);
+    setShowCreateTemplate(false);
+    setShowCreateMessage(false);
+    setShowListMessage(false);
+    setShowListTemplate(false);
+    setShowCreatePromptPage(false);
   };
 
   const handleToggleTemplateList = (status) => {
@@ -250,29 +311,46 @@ const ReadExcel = () => {
     setShowListMessage(status);
   };
 
-  const handleToggleMessengerTemplateList = () => {
+  const handleToggleMessengerTemplateList = (e) => {
+    console.log(e);
+    if (e == true) {
+      setShowMessengerTemplateList(false);
+      setShowSendMessenger(true);
+    }else{
+      setShowMessengerTemplateList(true);
+      setShowSendMessenger(false);
+    }
     setShowCreateTemplate(false);
     setShowCreateMessage(false);
     setShowListMessage(false);
     setShowSendMessage(false);
     setShowListTemplate(false);
-    setShowMessengerTemplateList(true);
     setShowPageInitial(false);
-    setShowSendMessenger(false);
   };
 
-  const handleToggleMessengerMessageList = () => {
-    setShowCreateTemplate(false);
-    setShowSendMessage(false);
-    setShowCreateMessage(false);
-    setShowListTemplate(false);
-    setShowListMessage(false);
+  const handleToggleMessengerMessageList = (e) => {
+    console.log(e);
+    if (e === true) {
+      console.log("yesrrr");
+    setShowMessengerMessageList(false);
+    setShowSendMessenger(true);
+    }else{
     setShowMessengerMessageList(true);
-    setShowPageInitial(false);
     setShowSendMessenger(false);
+    }
+    setShowCreateTemplate(false);
+    setShowSendMessage(false);
+    setShowCreateMessage(false);
+    setShowListTemplate(false);
+    setShowListMessage(false);
+    setShowPageInitial(false);
   };
 
-  const handleEditMessage = (message) => {
+  const handleEditMessage = (message,status) => {
+    if (status === true) {
+    setStatusMessage(true)
+    }
+    setShowMessengerMessageList(false)
     setMessageToEdit(message);
     setShowCreateTemplate(false);
     setShowSendMessage(false);
@@ -292,7 +370,11 @@ const ReadExcel = () => {
     setShowPageInitial(false);
   };
 
-  const handleEditTemplate = (message) => {
+  const handleEditTemplate = (message,status) => {
+    if (status === true) {
+    setStatusTemplate(true)
+    }
+    setShowMessengerTemplateList(false)
     setTemplateToEdit(message);
     setShowCreateTemplate(true);
     setShowSendMessage(false);
@@ -468,11 +550,11 @@ const ReadExcel = () => {
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
           setIndexColumn={setIndexColumn}
-          setGetAmountSend={setGetAmountSend}
-          getAmountSend={getAmountSend}
           setPhoneNumberEmpty={setPhoneNumberEmpty}
           onToggleMessage={handleTogglePromptPage}
           handleToggleSendWhatsapp={handleToggleSendWhatsapp}
+          handleToggleBackHome={handleToggleBackHome}
+
             />
           )}
           {showSendMessage && (
@@ -497,8 +579,7 @@ const ReadExcel = () => {
           onToggleTemplate={handleToggleTemplate}
           onToggleTemplateList={handleToggleMessengerTemplateList}
           onToggleMessageList={handleToggleMessengerMessageList}
-          getAmountSend={getAmountSend}
-          handleToggleBackHome={handleToggleBackHome}
+          handleToggleBackPageInitial={handleToggleBackPageInitial}
           handleTogglePromptPage={handleTogglePromptPage}
             />
           )}
@@ -506,6 +587,7 @@ const ReadExcel = () => {
           <CreateMessageSection 
           onToggleSave ={handleToggleSave} 
           onToggleCancel ={handleToggleCancel}
+          statusMessage={statusMessage}
           messageToEdit={messageToEdit}
           clearMessageToEdit={clearMessageToEdit}
           />}
@@ -514,12 +596,13 @@ const ReadExcel = () => {
           onToggleSave ={handleToggleSaveTemplate} 
           onToggleCancel ={handleToggleCancel} 
           templateToEdit={templateToEdit}
+          statusTemplate={statusTemplate}
           clearTemplateToEdit={clearTemplateToEdit}
           />}
            {showCreatePromptPage && 
           <CreatePromptPage
           onToggleSave ={handleToggleSavePage} 
-          onToggleCancel ={handleToggleCancel} 
+          onToggleCancel ={handleToggleCancelCreatePage} 
           messengerToEdit={messengerToEdit}
           clearMessengerToEdit={clearMessengerToEdit}
           />}
@@ -561,8 +644,6 @@ const ReadExcel = () => {
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
           setIndexColumn={setIndexColumn}
-          setGetAmountSend={setGetAmountSend}
-          getAmountSend={getAmountSend}
           setPhoneNumberEmpty={setPhoneNumberEmpty}
           onToggleTemplate={handleToggleTemplate}
           dataPage={dataPage}
@@ -576,11 +657,10 @@ const ReadExcel = () => {
           checkPhoneInvalid={checkPhoneInvalid}
           SpinnerComponent={spinnerComponent}
           setIndexColumn={setIndexColumn}
-          setGetAmountSend={setGetAmountSend}
-          getAmountSend={getAmountSend}
           setPhoneNumberEmpty={setPhoneNumberEmpty}
           onToggleMessage={handleToggleMessage}
           dataPage={dataPage}
+          onEditMessage={handleEditMessage}
           />}
           
         </div>)}
@@ -640,6 +720,8 @@ const UploadSection = ({ onClick, fileInputRef, onFileUpload }) => (
       style={{ display: 'none' }}
       onChange={onFileUpload}
     />
+    <h4>Please drop excel file here</h4>
+
   </div>
 );
 
@@ -677,7 +759,7 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
     <button className="btn-list" onClick={onToggleMessageList}>
        Message List <FontAwesomeIcon icon={faUpload} />
     </button>
-    <button className="send-btn" onClick ={handleToggleBackHome}>
+    <button className="send-btn" onClick ={() =>handleToggleBackHome(true)}>
         <FontAwesomeIcon icon={faArrowLeft}  />Back To Home
         </button>
       </div>
@@ -686,7 +768,7 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
     </div>
 );
 
-const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMessageToEdit}) => {
+const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMessageToEdit,statusMessage}) => {
   const [message, setMessage] = useState(messageToEdit ? messageToEdit.message : '');
   const [messageName, setMessageName] = useState(messageToEdit ? messageToEdit.name : '');
   const title = messageToEdit
@@ -713,7 +795,11 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
   
     try {
       localStorage.setItem('messages', JSON.stringify(updatedMessages));
+      if(statusMessage){
+      onToggleSave(true);
+      }else{
       onToggleSave();
+      }
       clearMessageToEdit();
     } catch (e) {
       if (e.name === 'QuotaExceededError') {
@@ -727,7 +813,19 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
   };
 
   const handleCancel = () => {
-    messageToEdit? onToggleSave() :onToggleCancel();
+    if (messageToEdit) {
+      if (statusMessage == true) {
+        onToggleSave(true);
+      } else {
+        onToggleSave();
+      }
+    } else {
+      if (statusMessage == true) {
+        onToggleCancel(true);
+      } else {
+        onToggleCancel();
+      }
+    }
     clearMessageToEdit();
   };
 
@@ -768,7 +866,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
   );
 };
 
-const CreateTemplate = ({onToggleSave,onToggleCancel,templateToEdit,clearTemplateToEdit}) => { 
+const CreateTemplate = ({onToggleSave,onToggleCancel,templateToEdit,clearTemplateToEdit,statusTemplate}) => { 
   const [template, setTemplate] = useState(templateToEdit? templateToEdit.template : '');
   const [templateName, setTemplateName] = useState(templateToEdit? templateToEdit.name : '');
   const title = templateToEdit
@@ -795,7 +893,11 @@ const handleSave = () => {
 
   try {
     localStorage.setItem('template', JSON.stringify(updatedMessages));
-    onToggleSave();
+    if (statusTemplate === true) {
+      onToggleSave(true);
+    } else {
+      onToggleSave();
+    }
     clearTemplateToEdit();
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
@@ -809,7 +911,19 @@ const handleSave = () => {
 };
 
   const handleCancel = () => {
-    templateToEdit? onToggleSave() :onToggleCancel();
+    if (templateToEdit) {
+      if (statusTemplate == true) {
+        onToggleSave(true);
+      } else {
+        onToggleSave();
+      }
+    } else {
+      if (statusTemplate == true) {
+        onToggleCancel(true);
+      } else {
+        onToggleCancel();
+      }
+    }
     clearTemplateToEdit();
   };
   return(
@@ -1075,35 +1189,34 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
               Select to send
           </label>
             </div>)}
-          {showPhoneNumber && (
-              <div className="selected-phone-number">
-                <label>Select Phone Numbers:</label>
-                <div className="select-phone-control">
-                  {selectedData.filter(value => value).map((value, index) => (
-                    <div className="select-phone" key={index}>
-                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                        {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked" >
-                            <FontAwesomeIcon icon={faCheck} />
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => handleSelectPhoneNumber(value, index)}
-                        className={
-                          selectedPhoneNumber.some((item) => item.value === value)
-                            ? "selected"
-                            : ""
-                        }
-                      >
-                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
-                      </button>
+            {showPhoneNumber && (
+            <div className="selected-phone-number">
+              <label>Select Phone Numbers:</label>
+              <div className="select-phone-control">
+                {Array.from(new Set(selectedData.filter(value => value))).map((value, index) => (
+                  <div className="select-phone" key={index}>
+                    <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
+                      {selectedPhoneNumber.some((item) => item.value === value) && (
+                        <div className="icon-checked">
+                          <FontAwesomeIcon icon={faCheck} />
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                    <button
+                      onClick={() => handleSelectPhoneNumber(value, index)}
+                      className={
+                        selectedPhoneNumber.some((item) => item.value === value)
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      {value.length > 18 ? `${value.slice(0, 18)}...` : value}
+                    </button>
+                  </div>
+                ))}
               </div>
-            )}
-           
+            </div>
+          )}
           </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
@@ -1395,7 +1508,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   );
 };
 //-------------------------------------Messenger sole---------------------------------
-const PageInitial = ({ onToggleMessageList, handleEditMessenger,getAmountSend,onToggleMessage,handleToggleSendWhatsapp }) => {
+const PageInitial = ({handleToggleBackHome,handleEditMessenger,onToggleMessage,handleToggleSendWhatsapp }) => {
   const [existingMessage, setExistingMessage] = useState(() => {
   const storedMessages = localStorage.getItem('page');
   return storedMessages ? JSON.parse(storedMessages).reverse() : [];
@@ -1412,10 +1525,6 @@ const PageInitial = ({ onToggleMessageList, handleEditMessenger,getAmountSend,on
       return;
     }
     handleToggleSendWhatsapp(selectedPage);
-  };
-
-  const handleCancel = () => {
-    onToggleMessageList(false);
   };
 
   const handleSelectMessage = (index, template) => {
@@ -1444,8 +1553,8 @@ const PageInitial = ({ onToggleMessageList, handleEditMessenger,getAmountSend,on
     <div className="send-message">
       <div className="send-head">
         <div className='amount-send'>
-        <h2>Message List</h2>
-        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        <h2>Page List</h2>
+        <h3>Select Some Page</h3>
         </div>
       </div> 
       <div className='add-message-list'>
@@ -1479,28 +1588,28 @@ const PageInitial = ({ onToggleMessageList, handleEditMessenger,getAmountSend,on
       </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Confirm Page<FontAwesomeIcon icon={faPaperPlane}/></button>
-        <button className='btn-cancel-add' onClick={handleCancel}>Back</button>
+        <button className='btn-cancel-add' onClick={()=>handleToggleBackHome(true)}>Back</button>
       </div>
     </div>
   );
 };
 const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, onToggleTemplate,
-  onToggleMessageList,onToggleTemplateList,getAmountSend,handleToggleBackHome,handleTogglePromptPage }) => (
+  onToggleMessageList,onToggleTemplateList,handleTogglePromptPage,handleToggleBackPageInitial }) => (
     <div className="send-message">
       <div className="send-head">
       <div className='amount-send'>
-        <h2>Send Message</h2>
-        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        <h2>Messenger</h2>
+        <h3>Send message by use messenger</h3>
         </div>
       </div>
       <div className="send-body-list">
-        <div className="icon-circle" onClick={onClick} data-tooltip="Add new file">
+        <div className="icon-circle" onClick={()=>onClick('addFromMessenger')} data-tooltip="Add new file">
           <FontAwesomeIcon icon={faPlus} />
         </div>
-        <div className="icon-circle" onClick={onToggleMessage} data-tooltip="Add Message">
+        <div className="icon-circle" onClick={()=>onToggleMessage(true)} data-tooltip="Add Message">
           <FontAwesomeIcon icon={faCommentDots} />
         </div>
-        <div className="icon-circle" onClick={onToggleTemplate} data-tooltip="Add Template">
+        <div className="icon-circle" onClick={()=>onToggleTemplate(true)} data-tooltip="Add Template">
           <FontAwesomeIcon icon={faFileAlt} />
         </div>
         <div className="icon-circle" onClick={handleTogglePromptPage} data-tooltip="Add Page">
@@ -1521,7 +1630,7 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
     <button className="btn-list" onClick={onToggleMessageList}>
        Message List <FontAwesomeIcon icon={faUpload} />
     </button>
-    <button className="send-btn" onClick ={ handleToggleBackHome}>
+    <button className="send-btn" onClick ={()=>handleToggleBackPageInitial()}>
         <FontAwesomeIcon icon={faArrowLeft}  />Back 
         </button>
       </div>
@@ -1573,7 +1682,7 @@ const handleSave = () => {
 };
 
   const handleCancel = () => {
-    messengerToEdit? onToggleSave() :onToggleSave();
+    messengerToEdit? onToggleSave() :onToggleCancel();
     clearMessengerToEdit();
   };
   return(
@@ -1619,7 +1728,7 @@ const handleSave = () => {
 }
 
 const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleMessage,dataPage }) => {
+  checkPhoneInvalid,setIndexColumn,setPhoneNumberEmpty,onToggleMessage,dataPage }) => {
   const [existingMessage, setExistingMessage] = useState(() => {
   const storedMessages = localStorage.getItem('messages');
   return storedMessages ? JSON.parse(storedMessages).reverse() : [];
@@ -1712,9 +1821,6 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
-      const count = getId.length;
-      localStorage.setItem('amountSend', getAmountSend + count);
-      setGetAmountSend(getAmountSend + count);
       if(selectedRadioOption === 'selectSend'){
         await checkPhoneInvalid(getId, indexCol,[]);
       }else{
@@ -1730,7 +1836,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
   };
 
   const handleCancel = () => {
-    onToggleMessageList(false);
+    onToggleMessageList(true);
   };
 
   const handleSelectMessage = (index,template) => {
@@ -1745,7 +1851,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
 
   const handleEdit = (index) => {
     const messageToEdit = existingMessage[index];
-    onEditMessage(messageToEdit);
+    onEditMessage(messageToEdit,true);
   };
 
   const handleDelete = (index) => {
@@ -1794,7 +1900,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
       <div className="send-head">
         <div className='amount-send'>
         <h2>Message List</h2>
-        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        <h3>Message List For Send Messenger</h3>
         </div>
       </div> 
       <div className='add-message-list'>
@@ -1828,7 +1934,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
       </div>
       <div className='dropdown-container'>
           <div className='dropdown-phone-container'>
-            <label>Select Phone Number Column:</label>
+            <label>Select Customer Name Column:</label>
             <select className='dropdown-select' value={selectedOption} onChange={handleDropdownChange}>
             <option value="" disabled>Select a column...</option>
               {headers.map((header, index) => (
@@ -1856,34 +1962,34 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
               Select to send
           </label>
             </div>)}
-          {showPhoneNumber && (
-              <div className="selected-phone-number">
-                <label>Select Phone Numbers:</label>
-                <div className="select-phone-control">
-                  {selectedData.filter(value => value).map((value, index) => (
-                    <div className="select-phone" key={index}>
-                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                        {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked" >
-                            <FontAwesomeIcon icon={faCheck} />
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => handleSelectPhoneNumber(value, index)}
-                        className={
-                          selectedPhoneNumber.some((item) => item.value === value)
-                            ? "selected"
-                            : ""
-                        }
-                      >
-                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
-                      </button>
+            {showPhoneNumber && (
+            <div className="selected-phone-number">
+              <label>Select Customer Name:</label>
+              <div className="select-phone-control">
+                {Array.from(new Set(selectedData.filter(value => value))).map((value, index) => (
+                  <div className="select-phone" key={index}>
+                    <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
+                      {selectedPhoneNumber.some((item) => item.value === value) && (
+                        <div className="icon-checked">
+                          <FontAwesomeIcon icon={faCheck} />
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                    <button
+                      onClick={() => handleSelectPhoneNumber(value, index)}
+                      className={
+                        selectedPhoneNumber.some((item) => item.value === value)
+                          ? "selected"
+                          : ""
+                      }
+                    >
+                      {value.length > 18 ? `${value.slice(0, 18)}...` : value}
+                    </button>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
           </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
@@ -1892,10 +1998,9 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
     </div>
   );
 };
-//222
+
 const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleTemplate,dataPage }) => {
-    console.log(dataPage);
+  checkPhoneInvalid,setIndexColumn,setPhoneNumberEmpty,onToggleTemplate,dataPage }) => {
     const [existingTemplate, setExistingTemplate] = useState(() => {
       const storedTemplate = localStorage.getItem('template');
       return storedTemplate ? JSON.parse(storedTemplate).reverse() : [];
@@ -1911,8 +2016,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   
   const handleSave = async () => {
-    console.log(sendTemplate);
-
     if (!sendTemplate || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -1930,7 +2033,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       });
       return;
     }
-    console.log(selectedPhoneNumber);
     const emptyIndexes = selectedData
     .map((item, index) => (item === "" ? index : -1))
     .filter(index => index !== -1);
@@ -1995,9 +2097,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
-      const count = getId.length;
-      localStorage.setItem('amountSend', getAmountSend + count);
-      setGetAmountSend(getAmountSend + count);
       if(selectedRadioOption === 'selectSend'){
       await checkPhoneInvalid(getId, indexCol,[]);
       }else{
@@ -2013,7 +2112,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
   };
  
   const handleCancel = () => {
-    onToggleTemplateList(false);
+    onToggleTemplateList(true);
   };
 
   const handleSelectTemplate = (index, template) => {
@@ -2037,7 +2136,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
 
   const handleEdit = (index) => {
     const messageToEdit = existingTemplate[index];
-    onEditTemplate(messageToEdit);
+    onEditTemplate(messageToEdit,true);
   };
 
   const handleDelete = (index) => {
@@ -2086,7 +2185,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       <div className="send-head">
       <div className='amount-send'>
         <h2>Template List</h2>
-        <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
+        <h3>Template List For Send Messenger</h3>
         </div>
       </div>
       <div className='add-message-list'>
@@ -2120,7 +2219,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       </div>
       <div className='dropdown-container'>
           <div className='dropdown-phone-container'>
-            <label>Select Phone Number Column:</label>
+            <label>Select Customer Name Column:</label>
             <select className='dropdown-select'value={selectedOption} onChange={handleDropdownChange}>
             <option value="" disabled>Select a column...</option>
               {headers.map((header, index) => (
@@ -2150,7 +2249,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
             </div>)}
               {showPhoneNumber && (
               <div className="selected-phone-number">
-                <label>Select Phone Numbers:</label>
+                <label>Select Customer Name:</label>
                 <div className="select-phone-control">
                   {selectedData.filter(value => value).map((value, index) => (
                     <div className="select-phone" key={index}>
