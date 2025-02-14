@@ -74,7 +74,8 @@ const ReadExcel = () => {
       setShowSendMessage(true);
       setShowPageInitial(false);
     }
-
+    setShowMessengerTemplateList(false);
+    setShowMessengerMessageList(false);
     setShowContent(true);
     setShowUpload(false);
     setShowCreateMessage(false);
@@ -82,8 +83,13 @@ const ReadExcel = () => {
     setShowListMessage(false);
     setShowListTemplate(false);
     setIndexColumn(null)
+    setShowSendMessenger(false);
+    setShowCreatePromptPage(false)
     setInvalidPhoneNumbers([]);
-  
+    setTemplateToEdit(null);
+    setMessageToEdit(null);
+    setPhoneNumberEmpty([]);
+    setPhoneNumberEmpty([]);
     reader.onload = (e) => {
       const binaryStr = e.target.result;
       const workbook = XLSX.read(binaryStr, { type: 'binary' });
@@ -192,7 +198,7 @@ const ReadExcel = () => {
     setShowListTemplate(false);
     
   };
-//111
+
   const handleToggleSendWhatsapp = (e) => {
     setShowSendMessenger(true);
     setShowSendMessage(false);
@@ -312,7 +318,6 @@ const ReadExcel = () => {
   };
 
   const handleToggleMessengerTemplateList = (e) => {
-    console.log(e);
     if (e == true) {
       setShowMessengerTemplateList(false);
       setShowSendMessenger(true);
@@ -329,9 +334,7 @@ const ReadExcel = () => {
   };
 
   const handleToggleMessengerMessageList = (e) => {
-    console.log(e);
     if (e === true) {
-      console.log("yesrrr");
     setShowMessengerMessageList(false);
     setShowSendMessenger(true);
     }else{
@@ -382,6 +385,7 @@ const ReadExcel = () => {
     setShowListTemplate(false);
     setShowListMessage(false);
   };
+  //--------------------------------
 
   const spinnerComponent = (status) => {
     setShowSpinner(status)
@@ -390,9 +394,15 @@ const ReadExcel = () => {
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
+    const showSelectChoiceElement = document.querySelector('.select-choice');
+    if (showSelectChoiceElement) {
+      setIsDragging(false);
+      setIsDraggingShow(false)
+    } else {
     handleFileUpload(file);
     setIsDragging(false);
     setIsDraggingShow(false);
+    }
   };
 
   const handleDragOver = (event) => {
@@ -404,10 +414,16 @@ const ReadExcel = () => {
     event.preventDefault();
     event.stopPropagation();
     const showTableElement = document.querySelector('.show-table');
-    if (showTableElement) {
-      setIsDraggingShow(true)
-    } else {
-      setIsDragging(true);
+    const showSelectChoiceElement = document.querySelector('.select-choice');
+    if(showSelectChoiceElement){
+      setIsDragging(false);
+      setIsDraggingShow(false)
+    }else{
+      if (showTableElement) {
+        setIsDraggingShow(true)
+      } else {
+        setIsDragging(true);
+      }
     }
   };
 
@@ -419,66 +435,65 @@ const ReadExcel = () => {
       setIsDraggingShow(false)
     }
   };
-//3 to nee sai nam kun dai
-  const clearMessageToEdit = () => {
+
+  const clearToEdit = (e) => {
+    if(e== "clear-message"){
     setMessageToEdit(null);
-  };
-
-  const clearTemplateToEdit = () => {
+    }else if(e== "clear-template"){
     setTemplateToEdit(null);
+    }else if(e== "clear-messenger"){
+    setMessengerToEdit(null);
+    }
   };
 
-  const clearMessengerToEdit = () => {
-    setMessengerToEdit(null);
-  };
-//333
-  const checkPhoneInvalid = async (ids,indexColumn,emptyIndexes) => {
-    let getId = [];
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-    const fetchPromises = ids.map((id) => {
-      var urlencoded = new URLSearchParams();
-      urlencoded.append("token", "uwetp05gfbbjkc2g");
-      urlencoded.append("page", "1");
-      urlencoded.append("limit", "10");
-      urlencoded.append("status", "all");
-      urlencoded.append("sort", "desc");
-      urlencoded.append("id", id);
-      urlencoded.append("referenceId", "");
-      urlencoded.append("from", "");
-      urlencoded.append("to", "");
-      urlencoded.append("ack", "");
-      urlencoded.append("msgId", "");
-      urlencoded.append("start_date", "");
-      urlencoded.append("end_date", "");
-  
-      var requestOptions = {
-        method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow'
-      };
-  
-      return fetch("https://api.ultramsg.com/instance104874/messages?" + urlencoded, requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          if(result.messages[0].status == "invalid"){
-            const phoneNumber = result.messages[0].to.replace("85620", "").replace("@c.us", "");
-            getId.push(phoneNumber)
-          }
-          })
-        .catch(error => {return error});
-    });
-  
-    Promise.all(fetchPromises)
-      .then(() => {
-        setInvalidPhoneNumbers(getId);
-        setIndexColumn(indexColumn);
-        setPhoneNumberEmpty(emptyIndexes)
+const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
+  let getId = [];
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+  const fetchPromises = ids.map(({ id, index }) => {
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("token", "kevozeqh6t0p78qs");
+    urlencoded.append("page", "1");
+    urlencoded.append("limit", "10");
+    urlencoded.append("status", "all");
+    urlencoded.append("sort", "desc");
+    urlencoded.append("id", id);
+    urlencoded.append("referenceId", "");
+    urlencoded.append("from", "");
+    urlencoded.append("to", "");
+    urlencoded.append("ack", "");
+    urlencoded.append("msgId", "");
+    urlencoded.append("start_date", "");
+    urlencoded.append("end_date", "");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    return fetch("https://api.ultramsg.com/instance96828/messages?" + urlencoded, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        if (result.messages[0].status === "invalid") {
+          const phoneNumber = result.messages[0].to.replace("85620", "").replace("@c.us", "");
+          getId.push({ phoneNumber: phoneNumber, index: index });
+        }
       })
-      .catch(error => {
-        return error;
-      });
-  };
+      .catch(error => { return error });
+  });
+
+  Promise.all(fetchPromises)
+    .then(() => {
+      setInvalidPhoneNumbers(getId);
+      setIndexColumn(indexColumn);
+      setPhoneNumberEmpty(emptyIndexes);
+    })
+    .catch(error => {
+      return error;
+    });
+};
 
   return (
     <div>
@@ -523,21 +538,20 @@ const ReadExcel = () => {
           </thead>
           <tbody>
             {data.map((row, index) => {
-              let phoneNumber = '';
-              if (indexColumn !== null && indexColumn !== undefined && headers[indexColumn]) {
-                phoneNumber = row[headers[indexColumn]]?.toString().trim() || '';
-              }
-              const isEmptyRow = phoneNumberEmpty?.includes(index) || false;
-              const isInvalid =
-                invalidPhoneNumbers.length > 0 && invalidPhoneNumbers.includes(phoneNumber);
-              return (
-                <tr key={index} className={`${isInvalid ? 'invalid-phone' : ''} ${isEmptyRow ? 'empty-phone' : ''}`}>
-                  {headers.map((header, i) => (
-                    <td key={i}>{row[header]}</td>
-                  ))}
-                </tr>
-              );
-            })}
+            let phoneNumber = '';
+            if (indexColumn !== null && indexColumn !== undefined && headers[indexColumn]) {
+              phoneNumber = row[headers[indexColumn]]?.toString().trim() || '';
+            }
+            const isEmptyRow = phoneNumberEmpty?.includes(index) || false;
+            const isInvalid = invalidPhoneNumbers.some(item => item.phoneNumber === phoneNumber && item.index === index);
+            return (
+              <tr key={index} className={`${isInvalid ? 'invalid-phone' : ''} ${isEmptyRow ? 'empty-phone' : ''}`}>
+                {headers.map((header, i) => (
+                  <td key={i}>{row[header]}</td>
+                ))}
+              </tr>
+            );
+          })}
           </tbody>
           </table>
         </div>
@@ -589,7 +603,7 @@ const ReadExcel = () => {
           onToggleCancel ={handleToggleCancel}
           statusMessage={statusMessage}
           messageToEdit={messageToEdit}
-          clearMessageToEdit={clearMessageToEdit}
+          clearToEdit={clearToEdit}
           />}
           {showCreateTemplate && 
           <CreateTemplate
@@ -597,14 +611,14 @@ const ReadExcel = () => {
           onToggleCancel ={handleToggleCancel} 
           templateToEdit={templateToEdit}
           statusTemplate={statusTemplate}
-          clearTemplateToEdit={clearTemplateToEdit}
+          clearToEdit={clearToEdit}
           />}
            {showCreatePromptPage && 
           <CreatePromptPage
           onToggleSave ={handleToggleSavePage} 
           onToggleCancel ={handleToggleCancelCreatePage} 
           messengerToEdit={messengerToEdit}
-          clearMessengerToEdit={clearMessengerToEdit}
+          clearToEdit={clearToEdit}
           />}
            {showListMessage && 
           <MessageList
@@ -768,7 +782,7 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
     </div>
 );
 
-const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMessageToEdit,statusMessage}) => {
+const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearToEdit,statusMessage}) => {
   const [message, setMessage] = useState(messageToEdit ? messageToEdit.message : '');
   const [messageName, setMessageName] = useState(messageToEdit ? messageToEdit.name : '');
   const title = messageToEdit
@@ -779,7 +793,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Template Name and Template cannot be empty.',
+        text: !messageName ? 'Message name cannot be empty.' : 'Message cannot be empty.',
       });
       return;
     }
@@ -800,7 +814,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
       }else{
       onToggleSave();
       }
-      clearMessageToEdit();
+      clearToEdit("clear-message");
     } catch (e) {
       if (e.name === 'QuotaExceededError') {
         Swal.fire({
@@ -826,7 +840,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
         onToggleCancel();
       }
     }
-    clearMessageToEdit();
+    clearToEdit("clear-message");
   };
 
   return (
@@ -866,7 +880,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
   );
 };
 
-const CreateTemplate = ({onToggleSave,onToggleCancel,templateToEdit,clearTemplateToEdit,statusTemplate}) => { 
+const CreateTemplate = ({onToggleSave,onToggleCancel,templateToEdit,clearToEdit,statusTemplate}) => { 
   const [template, setTemplate] = useState(templateToEdit? templateToEdit.template : '');
   const [templateName, setTemplateName] = useState(templateToEdit? templateToEdit.name : '');
   const title = templateToEdit
@@ -878,7 +892,7 @@ const handleSave = () => {
     Swal.fire({
       icon: 'warning',
       title: 'Warning',
-      text: 'Template Name and Template cannot be empty.',
+      text: !templateName ? 'Template name cannot be empty.' : 'Template cannot be empty.',
     });
     return;
   }
@@ -898,7 +912,7 @@ const handleSave = () => {
     } else {
       onToggleSave();
     }
-    clearTemplateToEdit();
+    clearToEdit("clear-template");
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
       Swal.fire({
@@ -924,7 +938,7 @@ const handleSave = () => {
         onToggleCancel();
       }
     }
-    clearTemplateToEdit();
+    clearToEdit("clear-template");
   };
   return(
   <div className="send-message">
@@ -977,36 +991,36 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    const emptyIndexes = selectedData
-  .map((item, index) => (item === "" ? index : -1))
-  .filter(index => index !== -1);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Selected data and message cannot be empty.',
+        text: !sendMessage ? 'Select a message, please.' : 'Select the phone number column, please.',
       });
       return;
     }
     if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please select a phone number.',
+        icon: 'warning',
+        title: 'warning',
+        text: 'Select a phone number, please.',
       });
       return;
     }
+    const emptyIndexes = selectedData
+  .map((item, index) => (item === "" ? index : -1))
+  .filter(index => index !== -1);
     setPhoneNumberEmpty([])
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData.map((value, index) => ({ value, index }))).map((item) => {
+    const dataItem = selectedRadioOption === 'selectSend' ? item.value : item.value;
       if (dataItem) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
+        urlencoded.append("token", "kevozeqh6t0p78qs");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${sendMessage}`);
         var requestOptions = {
@@ -1016,39 +1030,60 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
-            getId.push(result.id);
+            if (result.error) {
+            SpinnerComponent(false);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error,
+            });
+            return Promise.reject(result.error);
+          }
+            getId.push({id:result.id,index:item.index});
           })
           .catch((error) => {
+           SpinnerComponent(false);
             Swal.fire({
               icon: 'error',
               title: 'Error',
               text: error,
             });
+            return Promise.reject(error);
           });
       }
       return Promise.resolve();
     });
-
-    await Promise.all(fetchPromises);
-    setTimeout(async () => {
-      const count = getId.length;
-      localStorage.setItem('amountSend', getAmountSend + count);
-      setGetAmountSend(getAmountSend + count);
-      if(selectedRadioOption === 'selectSend'){
-        await checkPhoneInvalid(getId, indexCol,[]);
+    await Promise.all(fetchPromises).then(() => {
+      if (checkError.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "Message was not sent: demo daily limit exceeded",
+        });
+        return;
       }else{
-      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+        setTimeout(async () => {
+          const count = getId.length;
+          localStorage.setItem('amountSend', getAmountSend + count);
+          setGetAmountSend(getAmountSend + count);
+          if(selectedRadioOption === 'selectSend'){
+            await checkPhoneInvalid(getId, indexCol,[]);
+          }else{
+          await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+          }
+          SpinnerComponent(false);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'All messages have been sent successfully.',
+          });
+        }, 5000);
       }
-      SpinnerComponent(false);
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'All messages have been sent successfully.',
-      });
-    }, 5000);
+  })
+   
   };
 
   const handleCancel = () => {
@@ -1082,25 +1117,28 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
-      const selectedData = data.map(row => row[selectedIndex]);
+      let selectedData = data.map(row => row[selectedIndex]);
+      console.log(selectedData);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-    
+      console.log(nonNumberValues);
       if (nonNumberValues.length > 0) {
         Swal.fire({
-          icon: 'error',
-          title: 'Invalid Data',
-          text: 'Selected data must be numbers only.',
+          icon: 'warning',
+          title: 'Warning',
+          text: 'Select the phone number column, please.',
         });
         setShowRadio(false);
         return;
       }
+      selectedData = selectedData.map(value => (value.toString().length >= 8 ? value : ""));
+      console.log(selectedData);
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
     }
-    if(selectedIndex == ""){
+    if (selectedIndex === "") {
       setShowRadio(false);
-      }
+    }
   };
 
   const handleOptionChange = (e) => {
@@ -1113,13 +1151,12 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   };
 
   const handleSelectPhoneNumber = (value, index) => {
-    if (selectedPhoneNumber.some((item) => item.value === value)) {
-      setSelectedPhoneNumber((prev) =>
-        prev.filter((item) => item.value !== value)
-      );
-    } else {
-      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
-    }
+    setSelectedPhoneNumber((prev) => {
+      const updatedSelection = prev.some((item) => item.index === index)
+        ? prev.filter((item) => item.index !== index)
+        : [...prev, { value, index }];
+      return updatedSelection.length === 0 ? [] : updatedSelection;
+    });
   };
   
   return (
@@ -1193,26 +1230,24 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
             <div className="selected-phone-number">
               <label>Select Phone Numbers:</label>
               <div className="select-phone-control">
-                {Array.from(new Set(selectedData.filter(value => value))).map((value, index) => (
-                  <div className="select-phone" key={index}>
-                    <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                      {selectedPhoneNumber.some((item) => item.value === value) && (
-                        <div className="icon-checked">
-                          <FontAwesomeIcon icon={faCheck} />
-                        </div>
-                      )}
+                {selectedData.map((value, originalIndex) => (
+                  value && value.toString().length >= 8 && (
+                    <div className="select-phone" key={originalIndex}>
+                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
+                        {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
+                          <div className="icon-checked">
+                            <FontAwesomeIcon icon={faCheck} />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleSelectPhoneNumber(value, originalIndex)}
+                        className={selectedPhoneNumber.some((item) => item.index === originalIndex) ? "selected" : ""}
+                      >
+                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleSelectPhoneNumber(value, index)}
-                      className={
-                        selectedPhoneNumber.some((item) => item.value === value)
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      {value.length > 18 ? `${value.slice(0, 18)}...` : value}
-                    </button>
-                  </div>
+                  )
                 ))}
               </div>
             </div>
@@ -1242,12 +1277,11 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   const handleSave = async () => {
-
     if (!sendTemplate || !selectedData) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Selected data and template cannot be empty.',
+        text: !sendTemplate ? 'Select a template, please.' : 'Select the phone number column, please.',
       });
       return;
     }
@@ -1255,7 +1289,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Please select a phone number.',
+        text: 'Select a phone number, please.',
       });
       return;
     }
@@ -1267,14 +1301,15 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
-    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData).map((item) => {
-      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item;
-      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : selectedData.indexOf(item)];
+    let checkError = [];
+    const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData.map((value, index) => ({ value, index }))).map((item) => {
+      const dataItem = selectedRadioOption === 'selectSend' ? item.value : item.value;
+      const template = sendTemplate[selectedRadioOption === 'selectSend' ? item.index : item.index];
       if (dataItem) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
+        urlencoded.append("token", "kevozeqh6t0p78qs");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${template}`);
         var requestOptions = {
@@ -1284,39 +1319,56 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
           .then(response => response.json())
           .then(result => {
-            getId.push(result.id);
+            if (result.error) {
+              SpinnerComponent(false);
+              checkError.push(result.error);
+            }
+            getId.push({id:result.id,index:item.index});
           })
           .catch(error => {
+            SpinnerComponent(false);
             Swal.fire({
               icon: 'error',
               title: 'Error',
               text: error,
             });
+            return Promise.reject(error);
           });
       }
       return Promise.resolve();
     });
 
-    await Promise.all(fetchPromises);
-    setTimeout(async () => {
-      const count = getId.length;
-      localStorage.setItem('amountSend', getAmountSend + count);
-      setGetAmountSend(getAmountSend + count);
-      if(selectedRadioOption === 'selectSend'){
-      await checkPhoneInvalid(getId, indexCol,[]);
+    await Promise.all(fetchPromises).then(() => {
+      if (checkError.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "Message was not sent: demo daily limit exceeded",
+        });
+        return;
       }else{
-      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+        setTimeout(async () => {
+          const count = getId.length;
+          localStorage.setItem('amountSend', getAmountSend + count);
+          setGetAmountSend(getAmountSend + count);
+          if(selectedRadioOption === 'selectSend'){
+          await checkPhoneInvalid(getId, indexCol,[]);
+          }else{
+          await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+          }
+          SpinnerComponent(false);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Template have been sent successfully.',
+          });
+        }, 5000);
       }
-      SpinnerComponent(false);
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Template have been sent successfully.',
-      });
-    }, 5000);
+  })
+    
   };
 
   const handleCancel = () => {
@@ -1359,26 +1411,26 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
-      const selectedData = data.map(row => row[selectedIndex]);
+      let selectedData = data.map(row => row[selectedIndex]);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-    
-      if (nonNumberValues.length > 0 ) {
+      console.log(nonNumberValues);
+      if (nonNumberValues.length > 0) {
         Swal.fire({
-          icon: 'error',
-          title: 'Invalid Data',
-          text: 'Selected data must be numbers only.',
+          icon: 'warning',
+          title: 'Warning',
+          text: 'Select the phone number column, please.',
         });
-      setShowRadio(false);
-
+        setShowRadio(false);
         return;
       }
+      selectedData = selectedData.map(value => (value.toString().length >= 8 ? value : ""));
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
     }
-    if(selectedIndex == ""){
+    if (selectedIndex === "") {
       setShowRadio(false);
-      }
+    }
   };
 
   const handleOptionChange = (e) => {
@@ -1391,13 +1443,12 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   };
 
   const handleSelectPhoneNumber = (value, index) => {
-    if (selectedPhoneNumber.some((item) => item.value === value)) {
-      setSelectedPhoneNumber((prev) =>
-        prev.filter((item) => item.value !== value)
-      );
-    } else {
-      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
-    }
+    setSelectedPhoneNumber((prev) => {
+      const updatedSelection = prev.some((item) => item.index === index)
+        ? prev.filter((item) => item.index !== index)
+        : [...prev, { value, index }];
+      return updatedSelection.length === 0 ? [] : updatedSelection;
+    });
   };
 
   return (
@@ -1467,34 +1518,32 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
               Select to send
           </label>
             </div>)}
-              {showPhoneNumber && (
-              <div className="selected-phone-number">
-                <label>Select Phone Numbers:</label>
-                <div className="select-phone-control">
-                  {selectedData.filter(value => value).map((value, index) => (
-                    <div className="select-phone" key={index}>
-                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                        {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked"onClick={() => handleSelectPhoneNumber(value, index)}>
+            {showPhoneNumber && (
+            <div className="selected-phone-number">
+              <label>Select Phone Number:</label>
+              <div className="select-phone-control">
+                {selectedData.map((value, originalIndex) => (
+                  value && value.toString().length >= 8 && (
+                    <div className="select-phone" key={originalIndex}>
+                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
+                        {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
+                          <div className="icon-checked">
                             <FontAwesomeIcon icon={faCheck} />
                           </div>
                         )}
                       </div>
                       <button
-                        onClick={() => handleSelectPhoneNumber(value, index)}
-                        className={
-                          selectedPhoneNumber.some((item) => item.value === value)
-                            ? "selected"
-                            : ""
-                        }
+                        onClick={() => handleSelectPhoneNumber(value, originalIndex)}
+                        className={selectedPhoneNumber.some((item) => item.index === originalIndex) ? "selected" : ""}
                       >
                         {value.length > 18 ? `${value.slice(0, 18)}...` : value}
                       </button>
                     </div>
-                  ))}
-                </div>
+                  )
+                ))}
               </div>
-            )}
+            </div>
+          )}
           </div>
       <div className="btn-add">
         <button className="btn-save-add" onClick={handleSave}>
@@ -1639,7 +1688,7 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
     </div>
 );
 
-const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearMessengerToEdit}) => { 
+const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearToEdit}) => { 
   const [pageName, setPageName] = useState(messengerToEdit? messengerToEdit.name : '');
   const [pageId, setPageId] = useState(messengerToEdit? messengerToEdit.pageId : '');
   const [accessToken, setAccessToken] = useState(messengerToEdit? messengerToEdit.accessToken : '');
@@ -1648,14 +1697,18 @@ const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearMess
   : { header: 'Add Page', button: 'Save Page',title: 'Create your Page'};
 
 const handleSave = () => {
-  if (!pageName || !pageId || !accessToken) {
+  const showWarning = (text) => {
     Swal.fire({
       icon: 'warning',
       title: 'Warning',
-      text: 'Template Name and Template cannot be empty.',
+      text,
     });
-    return;
-  }
+  };
+  
+  if (!pageName) return showWarning('Page Name cannot be empty.');
+  if (!pageId) return showWarning('Page ID cannot be empty.');
+  if (!accessToken) return showWarning('Access Token cannot be empty.');
+
   let templateData = {
     name: pageName,
     pageId: pageId,
@@ -1669,7 +1722,7 @@ const handleSave = () => {
   try {
     localStorage.setItem('page', JSON.stringify(updatedMessages));
     onToggleSave();
-    clearMessengerToEdit();
+    clearToEdit("clear-messenger");
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
       Swal.fire({
@@ -1683,7 +1736,7 @@ const handleSave = () => {
 
   const handleCancel = () => {
     messengerToEdit? onToggleSave() :onToggleCancel();
-    clearMessengerToEdit();
+    clearToEdit("clear-messenger");
   };
   return(
   <div className="send-message">
@@ -1751,15 +1804,15 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Selected data and message cannot be empty.',
+        text: !sendMessage ? 'Select a message, please.' : 'Select the customer name column, please.',
       });
       return;
     }
     if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please select a phone number.',
+        icon: 'warning',
+        title: 'warning',
+        text: 'Select a customer name, please.',
       });
       return;
     }
@@ -1767,6 +1820,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
+    let getInvalidName = [];
     let filteredCustomers = [];
     try {
       const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
@@ -1774,47 +1828,64 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      if (!getResponse.ok) {
-        const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
-        throw new Error(errorData.message || "Failed to fetch conversations");
-      }
       const result = await getResponse.json();
+      if (result.success === false) {
+       SpinnerComponent(false);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Access_Token or Page_ID is invalid',
+        });
+        return;
+      }
       filteredCustomers = result.conversations.reduce((acc, dataFromGet) => {
-        selectedData.forEach((name) => {
-          if (name === dataFromGet.from.name && !acc.some(item => item.name === name)) {
-            acc.push({ name, id: dataFromGet.id });
+        selectedData.forEach((name, index) => {
+          if (name === dataFromGet.from.name && !acc.some(item => item.name === name && item.index === index)) {
+            acc.push({ name, id: dataFromGet.id, index });
           }
         });
         return acc;
       }, []);
+
+      selectedData.forEach((name, index) => {
+        if (!filteredCustomers.some(customer => customer.index === index)) {
+          emptyIndexes.push(index);
+        }
+      });
     } catch (error) {
       return error;
     }
     if (selectedRadioOption === 'selectSend') {
+      const matchedIndexes = new Set();
       filteredCustomers = filteredCustomers
-        .filter(item => selectedPhoneNumber.some(phone => phone.value === item.name))
-        .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name}));
-    }
+          .filter(item => {
+              const isMatched = selectedPhoneNumber.some(phone => phone.index === item.index);
+              if (isMatched) {
+                  matchedIndexes.add(item.index);
+              }
+              return isMatched;
+          })
+          .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name, index: dataFromGet.index }));
+      selectedPhoneNumber.forEach(phone => {
+          if (!matchedIndexes.has(phone.index)) {
+            getInvalidName.push(phone.index);
+          }
+      });
+  }
     const fetchPromises = filteredCustomers.map(async (item) => {
       const dataItem = item;
       if (dataItem) {
         try {
           const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
-          const postResponse = await fetch(postData, {
+          await fetch(postData, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: sendMessage}),
           });
-      
-          if (!postResponse.ok) {
-            const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
-            throw new Error(errorData.message || "Failed to send message");
-          }
-          const postResult = await postResponse.json();
+          
       } catch (error) {
         return error;
       }
-       
       }
       return Promise.resolve();
     });
@@ -1822,7 +1893,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
     await Promise.all(fetchPromises);
     setTimeout(async () => {
       if(selectedRadioOption === 'selectSend'){
-        await checkPhoneInvalid(getId, indexCol,[]);
+        await checkPhoneInvalid(getId, indexCol,getInvalidName);
       }else{
       await checkPhoneInvalid(getId, indexCol,emptyIndexes);
       }
@@ -1832,7 +1903,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
         title: 'Success',
         text: 'All messages have been sent successfully.',
       });
-    }, 5000);
+    },);
   };
 
   const handleCancel = () => {
@@ -1886,13 +1957,12 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
   };
 
   const handleSelectPhoneNumber = (value, index) => {
-    if (selectedPhoneNumber.some((item) => item.value === value)) {
-      setSelectedPhoneNumber((prev) =>
-        prev.filter((item) => item.value !== value)
-      );
-    } else {
-      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
-    }
+    setSelectedPhoneNumber((prev) => {
+      const updatedSelection = prev.some((item) => item.index === index)
+        ? prev.filter((item) => item.index !== index)
+        : [...prev, { value, index }];
+      return updatedSelection.length === 0 ? [] : updatedSelection;
+    });
   };
   
   return (
@@ -1966,27 +2036,25 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
             <div className="selected-phone-number">
               <label>Select Customer Name:</label>
               <div className="select-phone-control">
-                {Array.from(new Set(selectedData.filter(value => value))).map((value, index) => (
-                  <div className="select-phone" key={index}>
-                    <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                      {selectedPhoneNumber.some((item) => item.value === value) && (
-                        <div className="icon-checked">
-                          <FontAwesomeIcon icon={faCheck} />
-                        </div>
-                      )}
+                {Array.from(new Set(selectedData.map((value, originalIndex) => ({ value, originalIndex }))))
+                  .filter(({ value }) => value)
+                  .map(({ value, originalIndex }) => (
+                    <div className="select-phone" key={originalIndex}>
+                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
+                        {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
+                          <div className="icon-checked">
+                            <FontAwesomeIcon icon={faCheck} />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleSelectPhoneNumber(value, originalIndex)}
+                        className={selectedPhoneNumber.some((item) => item.index === originalIndex) ? "selected" : ""}
+                      >
+                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleSelectPhoneNumber(value, index)}
-                      className={
-                        selectedPhoneNumber.some((item) => item.value === value)
-                          ? "selected"
-                          : ""
-                      }
-                    >
-                      {value.length > 18 ? `${value.slice(0, 18)}...` : value}
-                    </button>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
@@ -2020,16 +2088,16 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Selected data and template cannot be empty.',
+        text: !sendTemplate ? 'Select a template, please.' : 'Select the customer name column, please.',
       });
       return;
     }
     
     if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please select a phone number.',
+        icon: 'warning',
+        title: 'warning',
+        text: 'Select a customer name, please.',
       });
       return;
     }
@@ -2041,6 +2109,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
+    let getInvalidName = [];
   let filteredCustomers = [];
   try {
     const getData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations?access_token=${dataPage.accessToken}`;
@@ -2048,57 +2117,73 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
-    if (!getResponse.ok) {
-      const errorData = await getResponse.json().catch(() => ({ message: "Failed to fetch conversations" }));
-      throw new Error(errorData.message || "Failed to fetch conversations");
-    }
-    const result = await getResponse.json();
-    filteredCustomers = result.conversations.reduce((acc, dataFromGet) => {
+        const result = await getResponse.json();
+        if (result.success === false) {
+          SpinnerComponent(false);
+           Swal.fire({
+             icon: 'error',
+             title: 'Error',
+             text: 'Access_Token or Page_ID is invalid',
+           });
+           return;
+         }
+      filteredCustomers = result.conversations.reduce((acc, dataFromGet) => {
+        selectedData.forEach((name, index) => {
+          if (name === dataFromGet.from.name) {
+            acc.push({ name, id: dataFromGet.id, index });
+          }
+        });
+        return acc;
+      }, []);
+
       selectedData.forEach((name, index) => {
-        if (name === dataFromGet.from.name) {
-          acc.push({ name, id: dataFromGet.id, index });
+        if (!filteredCustomers.some(customer => customer.index === index)) {
+          emptyIndexes.push(index);
         }
       });
-      return acc;
-    }, []);
-  } catch (error) {
-    return error;
-  }
-
+    } catch (error) {
+      return error;
+    }
   if (selectedRadioOption === 'selectSend') {
+    const matchedIndexes = new Set();
     filteredCustomers = filteredCustomers
-      .filter(item => selectedPhoneNumber.some(phone => phone.value === item.name))
-      .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name, index: dataFromGet.index }));
-  }
-
+        .filter(item => {
+            const isMatched = selectedPhoneNumber.some(phone => phone.index === item.index);
+            if (isMatched) {
+                matchedIndexes.add(item.index);
+            }
+            return isMatched;
+        })
+        .map(dataFromGet => ({ id: dataFromGet.id, name: dataFromGet.name, index: dataFromGet.index }));
+    selectedPhoneNumber.forEach(phone => {
+        if (!matchedIndexes.has(phone.index)) {
+          getInvalidName.push(phone.index);
+        }
+    });
+}
   const fetchPromises = filteredCustomers.map(async (item) => {
     const dataItem = item;
     const template = sendTemplate[dataItem.index];
     if (dataItem) {
       try {
         const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
-        const postResponse = await fetch(postData, {
+        await fetch(postData, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: template }),
         });
-    
-        if (!postResponse.ok) {
-          const errorData = await postResponse.json().catch(() => ({ message: "Failed to send message" }));
-          throw new Error(errorData.message || "Failed to send message");
-        }
+        
       } catch (error) {
         return error;
       }
     }
-    
     return Promise.resolve();
   });
 
     await Promise.all(fetchPromises);
     setTimeout(async () => {
       if(selectedRadioOption === 'selectSend'){
-      await checkPhoneInvalid(getId, indexCol,[]);
+      await checkPhoneInvalid(getId, indexCol,getInvalidName);
       }else{
       await checkPhoneInvalid(getId, indexCol,emptyIndexes);
       }
@@ -2108,7 +2193,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
         title: 'Success',
         text: 'Template have been sent successfully.',
       });
-    }, 5000);
+    },);
   };
  
   const handleCancel = () => {
@@ -2171,13 +2256,12 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
   };
 
   const handleSelectPhoneNumber = (value, index) => {
-    if (selectedPhoneNumber.some((item) => item.value === value)) {
-      setSelectedPhoneNumber((prev) =>
-        prev.filter((item) => item.value !== value)
-      );
-    } else {
-      setSelectedPhoneNumber((prev) => [...prev, { value, index }]);
-    }
+    setSelectedPhoneNumber((prev) => {
+      const updatedSelection = prev.some((item) => item.index === index)
+        ? prev.filter((item) => item.index !== index)
+        : [...prev, { value, index }];
+      return updatedSelection.length === 0 ? [] : updatedSelection;
+    });
   };
 
   return (
@@ -2247,30 +2331,28 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
               Select to send
           </label>
             </div>)}
-              {showPhoneNumber && (
+            {showPhoneNumber && (
               <div className="selected-phone-number">
                 <label>Select Customer Name:</label>
                 <div className="select-phone-control">
-                  {selectedData.filter(value => value).map((value, index) => (
-                    <div className="select-phone" key={index}>
-                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
-                        {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked"onClick={() => handleSelectPhoneNumber(value, index)}>
-                            <FontAwesomeIcon icon={faCheck} />
-                          </div>
-                        )}
+                  {selectedData.map((value, originalIndex) => (
+                    value && (
+                      <div className="select-phone" key={originalIndex}>
+                        <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
+                          {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
+                            <div className="icon-checked">
+                              <FontAwesomeIcon icon={faCheck} />
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleSelectPhoneNumber(value, originalIndex)}
+                          className={selectedPhoneNumber.some((item) => item.index === originalIndex) ? "selected" : ""}
+                        >
+                          {value.length > 18 ? `${value.slice(0, 18)}...` : value}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleSelectPhoneNumber(value, index)}
-                        className={
-                          selectedPhoneNumber.some((item) => item.value === value)
-                            ? "selected"
-                            : ""
-                        }
-                      >
-                        {value.length > 18 ? `${value.slice(0, 18)}...` : value}
-                      </button>
-                    </div>
+                    )
                   ))}
                 </div>
               </div>
