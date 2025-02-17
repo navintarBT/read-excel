@@ -24,16 +24,15 @@ const ReadExcel = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [invalidPhoneNumbers, setInvalidPhoneNumbers] = useState([]);
   const [indexColumn, setIndexColumn] = useState(null);
+  const [phoneNumberEmpty, setPhoneNumberEmpty] = useState([]);
   const [getAmountSend, setGetAmountSend] = useState(parseInt(localStorage.getItem('amountSend'), 10) || 0);
   const today = new Date().toISOString().split('T')[0];
   const lastDate = localStorage.getItem('lastUpdateDate') || '';
   if (lastDate !== today) {
     setGetAmountSend(0);
-    console.log("object");
     localStorage.setItem('amountSend', 0);
     localStorage.setItem('lastUpdateDate', today); 
   }
-  console.log(getAmountSend);
 
   const handleFileUpload = (file) => {
     const validExtensions = ['xlsx', 'xls', 'csv'];
@@ -236,8 +235,8 @@ const ReadExcel = () => {
   const clearTemplateToEdit = () => {
     setTemplateToEdit(null);
   };
-
-  const checkPhoneInvalid = async (ids,indexColumn) => {
+//333
+  const checkPhoneInvalid = async (ids,indexColumn,emptyIndexes) => {
     let getId = [];
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -262,26 +261,26 @@ const ReadExcel = () => {
         headers: myHeaders,
         redirect: 'follow'
       };
-  //111
+  
       return fetch("https://api.ultramsg.com/instance104874/messages?" + urlencoded, requestOptions)
         .then(response => response.json())
         .then(result => {
-          console.log(result)
           if(result.messages[0].status == "invalid"){
             const phoneNumber = result.messages[0].to.replace("85620", "").replace("@c.us", "");
             getId.push(phoneNumber)
           }
           })
-        .catch(error => console.log('error', error));
+        .catch(error => {return error});
     });
   
     Promise.all(fetchPromises)
       .then(() => {
         setInvalidPhoneNumbers(getId);
         setIndexColumn(indexColumn);
+        setPhoneNumberEmpty(emptyIndexes)
       })
       .catch(error => {
-        console.log('Error in one of the requests', error);
+        return error;
       });
   };
 
@@ -322,15 +321,17 @@ const ReadExcel = () => {
               </tr>
             </thead>
             <tbody>
+              {/* 111 */}
             {data.map((row, index) => {
               let phoneNumber = '';
               if (indexColumn !== null && indexColumn !== undefined && headers[indexColumn]) {
                 phoneNumber = row[headers[indexColumn]]?.toString().trim() || '';
               }
+              const isEmptyRow = phoneNumberEmpty?.includes(index) || false;
               const isInvalid =
                 invalidPhoneNumbers.length > 0 && invalidPhoneNumbers.includes(phoneNumber);
               return (
-                <tr key={index} className={isInvalid ? 'invalid-phone' : ''}>
+                <tr key={index} className={`${isInvalid ? 'invalid-phone' : ''} ${isEmptyRow ? 'empty-phone' : ''}`}>
                   {headers.map((header, i) => (
                     <td key={i}>{row[header]}</td>
                   ))}
@@ -378,6 +379,8 @@ const ReadExcel = () => {
           setIndexColumn={setIndexColumn}
           setGetAmountSend={setGetAmountSend}
           getAmountSend={getAmountSend}
+          setPhoneNumberEmpty={setPhoneNumberEmpty}
+          onToggleMessage={handleToggleMessage}
           />}
 
            {showListTemplate && 
@@ -391,6 +394,8 @@ const ReadExcel = () => {
           setIndexColumn={setIndexColumn}
           setGetAmountSend={setGetAmountSend}
           getAmountSend={getAmountSend}
+          setPhoneNumberEmpty={setPhoneNumberEmpty}
+          onToggleTemplate={handleToggleTemplate}
           />}
         </div>)}
       </div>
@@ -511,15 +516,13 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearMe
       onToggleSave();
       clearMessageToEdit();
     } catch (e) {
-      if (e.name === 'QuotaExceededError') {0
+      if (e.name === 'QuotaExceededError') {
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
           text: 'Local storage is full. Please clear some space and try again.',
         });
-      } else {
-        console.error(e);
-      }
+      } 
     }
   };
 
@@ -601,9 +604,7 @@ const handleSave = () => {
         title: 'Oops...',
         text: 'Local storage is full. Please clear some space and try again.',
       });
-    } else {
-      console.error(e);
-    }
+    } 
   }
 };
 
@@ -647,11 +648,10 @@ const handleSave = () => {
 }
 
 const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
-    console.log(getAmountSend);
-    const [existingMessage, setExistingMessage] = useState(() => {
-      const storedMessages = localStorage.getItem('messages');
-      return storedMessages ? JSON.parse(storedMessages).reverse() : [];
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleMessage }) => {
+  const [existingMessage, setExistingMessage] = useState(() => {
+  const storedMessages = localStorage.getItem('messages');
+  return storedMessages ? JSON.parse(storedMessages).reverse() : [];
   });
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
@@ -664,6 +664,9 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
+    const emptyIndexes = selectedData
+  .map((item, index) => (item === "" ? index : -1))
+  .filter(index => index !== -1);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -680,6 +683,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
       });
       return;
     }
+    setPhoneNumberEmpty([])
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
@@ -698,7 +702,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           body: urlencoded,
           redirect: 'follow'
         };
-//333
+
         return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
@@ -720,7 +724,11 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
       const count = getId.length;
       localStorage.setItem('amountSend', getAmountSend + count);
       setGetAmountSend(getAmountSend + count);
-      await checkPhoneInvalid(getId, indexCol);
+      if(selectedRadioOption === 'selectSend'){
+        await checkPhoneInvalid(getId, indexCol,[]);
+      }else{
+      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+      }
       SpinnerComponent(false);
       Swal.fire({
         icon: 'success',
@@ -733,6 +741,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const handleCancel = () => {
     onToggleMessageList(false);
   };
+
   const handleSelectMessage = (index,template) => {
     if (selectedMessage === index) {
       setSelectedMessage(null); 
@@ -808,11 +817,16 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
       </div>
+      <div className='add-message-list'>
+      <div className="icon-add-message" onClick={onToggleMessage}data-tooltip="Add message">
+          <FontAwesomeIcon icon={faPlus} />
+        </div>
+      </div>
       <div className="message-item-container">
         {existingMessage.map((template, index) => (
           <div key={index} className="message-item">
             <div className="action-container">
-              <div className="control-checked">
+              <div className="control-checked"onClick={() => handleSelectMessage(index,template)}>
                 {selectedMessage === index && (
                   <div className="icon-checked">
                     <FontAwesomeIcon icon={faCheck} />
@@ -868,9 +882,9 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
                 <div className="select-phone-control">
                   {selectedData.filter(value => value).map((value, index) => (
                     <div className="select-phone" key={index}>
-                      <div className="control-checked">
+                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
                         {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked">
+                          <div className="icon-checked" >
                             <FontAwesomeIcon icon={faCheck} />
                           </div>
                         )}
@@ -899,9 +913,9 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     </div>
   );
 };
-
+//222
 const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,SpinnerComponent,
-  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend }) => {
+  checkPhoneInvalid,setIndexColumn,getAmountSend,setGetAmountSend,setPhoneNumberEmpty,onToggleTemplate }) => {
     const [existingTemplate, setExistingTemplate] = useState(() => {
       const storedTemplate = localStorage.getItem('template');
       return storedTemplate ? JSON.parse(storedTemplate).reverse() : [];
@@ -916,7 +930,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   const handleSave = async () => {
-    console.log(sendTemplate)
+
     if (!sendTemplate || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -933,6 +947,11 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       });
       return;
     }
+    const emptyIndexes = selectedData
+    .map((item, index) => (item === "" ? index : -1))
+    .filter(index => index !== -1);
+
+    setPhoneNumberEmpty([])
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
@@ -952,7 +971,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           body: urlencoded,
           redirect: 'follow'
         };
-//222
+
         return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then(result => {
@@ -974,7 +993,11 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
       const count = getId.length;
       localStorage.setItem('amountSend', getAmountSend + count);
       setGetAmountSend(getAmountSend + count);
-      await checkPhoneInvalid(getId, indexCol);
+      if(selectedRadioOption === 'selectSend'){
+      await checkPhoneInvalid(getId, indexCol,[]);
+      }else{
+      await checkPhoneInvalid(getId, indexCol,emptyIndexes);
+      }
       SpinnerComponent(false);
       Swal.fire({
         icon: 'success',
@@ -1021,7 +1044,6 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
 
   const handleDropdownChange = (e) => {
     const selectedIndex = e.target.value;
-    console.log(selectedIndex);
     setSelectedOption(selectedIndex);
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
@@ -1074,11 +1096,16 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         <h3>Total messages sent:<label className='amount'> {getAmountSend}</label></h3>
         </div>
       </div>
+      <div className='add-message-list'>
+      <div className="icon-add-message"onClick={onToggleTemplate} data-tooltip="Add template">
+          <FontAwesomeIcon icon={faPlus} />
+        </div>
+      </div>
       <div className="message-item-container">
         {existingTemplate.map((template, index) => (
           <div key={index} className="message-item">
             <div className="action-container">
-              <div className="control-checked">
+              <div className="control-checked" onClick={() => handleSelectTemplate(index, template)}>
               {selectedTemplate === index && (
                   <div className="icon-checked">
                     <FontAwesomeIcon icon={faCheck} />
@@ -1134,9 +1161,9 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
                 <div className="select-phone-control">
                   {selectedData.filter(value => value).map((value, index) => (
                     <div className="select-phone" key={index}>
-                      <div className="control-checked">
+                      <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, index)}>
                         {selectedPhoneNumber.some((item) => item.value === value) && (
-                          <div className="icon-checked">
+                          <div className="icon-checked"onClick={() => handleSelectPhoneNumber(value, index)}>
                             <FontAwesomeIcon icon={faCheck} />
                           </div>
                         )}
