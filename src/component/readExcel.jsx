@@ -793,7 +793,7 @@ const CreateMessageSection = ({onToggleSave,onToggleCancel,messageToEdit,clearTo
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: !messageName ? 'Message name cannot be empty.' : 'Message cannot be empty.',
+        text: !messageName ? 'Message Name cannot be empty.' : 'Message cannot be empty.',
       });
       return;
     }
@@ -892,7 +892,7 @@ const handleSave = () => {
     Swal.fire({
       icon: 'warning',
       title: 'Warning',
-      text: !templateName ? 'Template name cannot be empty.' : 'Template cannot be empty.',
+      text: !templateName ? 'Template Name cannot be empty.' : 'Template cannot be empty.',
     });
     return;
   }
@@ -991,6 +991,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
+    console.log(selectedData);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -1014,6 +1015,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     setIndexColumn(null)
     SpinnerComponent(true);
     let getId = [];
+    let checkError = [];
     const fetchPromises = (selectedRadioOption === 'selectSend' ? selectedPhoneNumber : selectedData.map((value, index) => ({ value, index }))).map((item) => {
     const dataItem = selectedRadioOption === 'selectSend' ? item.value : item.value;
       if (dataItem) {
@@ -1035,23 +1037,14 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           .then((result) => {
             if (result.error) {
             SpinnerComponent(false);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: result.error,
-            });
-            return Promise.reject(result.error);
-          }
+            checkError.push(result.error);
+          }else{
             getId.push({id:result.id,index:item.index});
+          }
           })
           .catch((error) => {
            SpinnerComponent(false);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error,
-            });
-            return Promise.reject(error);
+           checkError.push(error);
           });
       }
       return Promise.resolve();
@@ -1061,7 +1054,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: "Message was not sent: demo daily limit exceeded",
+          text: "Message sending failed: Daily limit exceeded or instance closed.",
         });
         return;
       }else{
@@ -1110,6 +1103,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     localStorage.setItem('messages', JSON.stringify(updatedTemplates.reverse()));
     setExistingMessage(updatedTemplates.reverse()); 
     setSelectedMessage(null);
+    setSendMessage(null);
   };
 
   const handleDropdownChange = (e) => {
@@ -1128,16 +1122,18 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           text: 'Select the phone number column, please.',
         });
         setShowRadio(false);
+        setSelectedData("");
         return;
-      }
-      selectedData = selectedData.map(value => (value.toString().length >= 8 ? value : ""));
-      console.log(selectedData);
+      }else{
+      selectedData = selectedData.map(value => (value.toString().length === 8 ? value : ""));
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
+      }
     }
     if (selectedIndex === "") {
       setShowRadio(false);
+      setSelectedData("");
     }
   };
 
@@ -1200,7 +1196,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           <div className='dropdown-phone-container'>
             <label>Select Phone Number Column:</label>
             <select className='dropdown-select' value={selectedOption} onChange={handleDropdownChange}>
-            <option value="" disabled>Select a column...</option>
+            <option value="" >Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
@@ -1231,7 +1227,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
               <label>Select Phone Numbers:</label>
               <div className="select-phone-control">
                 {selectedData.map((value, originalIndex) => (
-                  value && value.toString().length >= 8 && (
+                  value && value.toString().length === 8 && (
                     <div className="select-phone" key={originalIndex}>
                       <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
                         {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
@@ -1254,8 +1250,8 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           )}
           </div>
       <div className='btn-add'>
-        <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
-        <button className='btn-cancel-add' onClick={handleCancel}>Back</button>
+        <button className='btn-save-add' onClick={handleSave}>Send Message<FontAwesomeIcon icon={faPaperPlane}/></button>
+        <button className='btn-cancel-add' onClick={handleCancel}>Cancel</button>
       </div>
     </div>
   );
@@ -1325,17 +1321,13 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
             if (result.error) {
               SpinnerComponent(false);
               checkError.push(result.error);
-            }
+            }else{
             getId.push({id:result.id,index:item.index});
+            }
           })
           .catch(error => {
             SpinnerComponent(false);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: error,
-            });
-            return Promise.reject(error);
+            checkError.push(error);
           });
       }
       return Promise.resolve();
@@ -1346,7 +1338,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: "Message was not sent: demo daily limit exceeded",
+          text: "Message sending failed: Daily limit exceeded or instance closed.",
         });
         return;
       }else{
@@ -1404,6 +1396,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     localStorage.setItem('template', JSON.stringify(updatedTemplates.reverse()));
     setExistingTemplate(updatedTemplates.reverse()); 
     setSelectedTemplate(null);
+    setSendTemplate(null);
   };
 
   const handleDropdownChange = (e) => {
@@ -1421,15 +1414,18 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           text: 'Select the phone number column, please.',
         });
         setShowRadio(false);
+        setSelectedData("");
         return;
-      }
-      selectedData = selectedData.map(value => (value.toString().length >= 8 ? value : ""));
+      }else{
+      selectedData = selectedData.map(value => (value.toString().length === 8 ? value : ""));
       setShowRadio(true);
       setSelectedData(selectedData);
       setIndexCol(dataIndex);
+      }
     }
     if (selectedIndex === "") {
       setShowRadio(false);
+      setSelectedData("");
     }
   };
 
@@ -1492,7 +1488,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           <div className='dropdown-phone-container'>
             <label>Select Phone Number Column:</label>
             <select className='dropdown-select'value={selectedOption} onChange={handleDropdownChange}>
-            <option value="" disabled>Select a column...</option>
+            <option value="">Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
@@ -1523,7 +1519,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
               <label>Select Phone Number:</label>
               <div className="select-phone-control">
                 {selectedData.map((value, originalIndex) => (
-                  value && value.toString().length >= 8 && (
+                  value && value.toString().length === 8 && (
                     <div className="select-phone" key={originalIndex}>
                       <div className="control-checked" onClick={() => handleSelectPhoneNumber(value, originalIndex)}>
                         {selectedPhoneNumber.some((item) => item.index === originalIndex) && (
@@ -2118,6 +2114,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       headers: { "Content-Type": "application/json" },
     });
         const result = await getResponse.json();
+        console.log(result);
         if (result.success === false) {
           SpinnerComponent(false);
            Swal.fire({
@@ -2167,11 +2164,12 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     if (dataItem) {
       try {
         const postData = `https://pages.fm/api/v1/pages/${dataPage.pageId}/conversations/${dataItem.id}/messages?access_token=${dataPage.accessToken}&&action=reply_inbox`;
-        await fetch(postData, {
+        let a = await fetch(postData, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: template }),
         });
+        console.log(a);
         
       } catch (error) {
         return error;
@@ -2229,6 +2227,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     localStorage.setItem('template', JSON.stringify(updatedTemplates.reverse()));
     setExistingTemplate(updatedTemplates.reverse()); 
     setSelectedTemplate(null);
+    setSendTemplate(null);
   };
 
   const handleDropdownChange = (e) => {
