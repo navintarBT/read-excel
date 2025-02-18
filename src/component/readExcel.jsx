@@ -139,6 +139,13 @@ const ReadExcel = () => {
 
   //when click select whatsapp and messenger
   const handleToggleSendMessage = (e) => {
+    if(e == true) {
+    setStatusMessage(true)
+    setStatusTemplate(true)
+    }else{
+    setStatusMessage(false)
+    setStatusTemplate(false)
+    }
     setOptionSend(e === true);
     setSelectChoice(false);
     setShowUpload(true);
@@ -453,7 +460,7 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
 
   const fetchPromises = ids.map(({ id, index }) => {
     var urlencoded = new URLSearchParams();
-    urlencoded.append("token", "kevozeqh6t0p78qs");
+    urlencoded.append("token", "uwetp05gfbbjkc2g");
     urlencoded.append("page", "1");
     urlencoded.append("limit", "10");
     urlencoded.append("status", "all");
@@ -473,7 +480,7 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
       redirect: 'follow'
     };
 
-    return fetch("https://api.ultramsg.com/instance96828/messages?" + urlencoded, requestOptions)
+    return fetch("https://api.ultramsg.com/instance104874/messages?" + urlencoded, requestOptions)
       .then(response => response.json())
       .then(result => {
         if (result.messages[0].status === "invalid") {
@@ -991,7 +998,6 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    console.log(selectedData);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -1022,7 +1028,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "kevozeqh6t0p78qs");
+        urlencoded.append("token", "uwetp05gfbbjkc2g");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${sendMessage}`);
         var requestOptions = {
@@ -1032,7 +1038,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
             if (result.error) {
@@ -1112,9 +1118,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       let selectedData = data.map(row => row[selectedIndex]);
-      console.log(selectedData);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-      console.log(nonNumberValues);
       if (nonNumberValues.length > 0) {
         Swal.fire({
           icon: 'warning',
@@ -1305,7 +1309,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "kevozeqh6t0p78qs");
+        urlencoded.append("token", "uwetp05gfbbjkc2g");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${template}`);
         var requestOptions = {
@@ -1315,7 +1319,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance96828/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
           .then(response => response.json())
           .then(result => {
             if (result.error) {
@@ -1406,7 +1410,6 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     if (dataIndex !== -1) {
       let selectedData = data.map(row => row[selectedIndex]);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-      console.log(nonNumberValues);
       if (nonNumberValues.length > 0) {
         Swal.fire({
           icon: 'warning',
@@ -2114,7 +2117,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       headers: { "Content-Type": "application/json" },
     });
         const result = await getResponse.json();
-        console.log(result);
         if (result.success === false) {
           SpinnerComponent(false);
            Swal.fire({
@@ -2169,8 +2171,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: template }),
         });
-        console.log(a);
-        
       } catch (error) {
         return error;
       }
