@@ -139,6 +139,13 @@ const ReadExcel = () => {
 
   //when click select whatsapp and messenger
   const handleToggleSendMessage = (e) => {
+    if(e == true) {
+    setStatusMessage(true)
+    setStatusTemplate(true)
+    }else{
+    setStatusMessage(false)
+    setStatusTemplate(false)
+    }
     setOptionSend(e === true);
     setSelectChoice(false);
     setShowUpload(true);
@@ -991,7 +998,6 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    console.log(selectedData);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -1112,9 +1118,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     const dataIndex = headers.indexOf(selectedIndex);
     if (dataIndex !== -1) {
       let selectedData = data.map(row => row[selectedIndex]);
-      console.log(selectedData);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-      console.log(nonNumberValues);
       if (nonNumberValues.length > 0) {
         Swal.fire({
           icon: 'warning',
@@ -1406,7 +1410,6 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     if (dataIndex !== -1) {
       let selectedData = data.map(row => row[selectedIndex]);
       const nonNumberValues = selectedData.filter(value => isNaN(value));
-      console.log(nonNumberValues);
       if (nonNumberValues.length > 0) {
         Swal.fire({
           icon: 'warning',
@@ -2114,7 +2117,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       headers: { "Content-Type": "application/json" },
     });
         const result = await getResponse.json();
-        console.log(result);
         if (result.success === false) {
           SpinnerComponent(false);
            Swal.fire({
@@ -2169,8 +2171,6 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: template }),
         });
-        console.log(a);
-        
       } catch (error) {
         return error;
       }
