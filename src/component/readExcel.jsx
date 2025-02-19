@@ -1287,8 +1287,8 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     }
     if (selectedRadioOption === 'selectSend' && selectedPhoneNumber.length === 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
+        icon: 'warning',
+        title: 'warning',
         text: 'Select a phone number, please.',
       });
       return;
@@ -1549,7 +1549,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           Send Template <FontAwesomeIcon icon={faPaperPlane}/>
         </button>
         <button className="btn-cancel-add" onClick={handleCancel}>
-          Back
+          cancel
         </button>
       </div>
     </div>
@@ -1796,9 +1796,6 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    const emptyIndexes = selectedData
-  .map((item, index) => (item === "" ? index : -1))
-  .filter(index => index !== -1);
     if (!sendMessage || !selectedData) {
       Swal.fire({
         icon: 'warning',
@@ -1815,6 +1812,9 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
       });
       return;
     }
+    const emptyIndexes = selectedData
+    .map((item, index) => (item === "" ? index : -1))
+    .filter(index => index !== -1);
     setPhoneNumberEmpty([])
     setIndexColumn(null)
     SpinnerComponent(true);
@@ -1942,6 +1942,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
       setIndexCol(dataIndex);
     }
     if(selectedIndex == ""){
+      setSelectedData("");
       setShowRadio(false);
       }
   };
@@ -2005,7 +2006,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
           <div className='dropdown-phone-container'>
             <label>Select Customer Name Column:</label>
             <select className='dropdown-select' value={selectedOption} onChange={handleDropdownChange}>
-            <option value="" disabled>Select a column...</option>
+            <option value="">Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
@@ -2060,7 +2061,7 @@ const MessengerMessageList = ({ onToggleMessageList, onEditMessage,headers,data,
           </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Send Template<FontAwesomeIcon icon={faPaperPlane}/></button>
-        <button className='btn-cancel-add' onClick={handleCancel}>Back</button>
+        <button className='btn-cancel-add' onClick={handleCancel}>Cancel</button>
       </div>
     </div>
   );
@@ -2241,6 +2242,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
       setIndexCol(dataIndex);
     }
     if(selectedIndex == ""){
+      setSelectedData("");
       setShowRadio(false);
       }
   };
@@ -2304,7 +2306,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
           <div className='dropdown-phone-container'>
             <label>Select Customer Name Column:</label>
             <select className='dropdown-select'value={selectedOption} onChange={handleDropdownChange}>
-            <option value="" disabled>Select a column...</option>
+            <option value="">Select a column...</option>
               {headers.map((header, index) => (
                 <option key={index} value={header}>{header}</option>
               ))}
@@ -2362,7 +2364,7 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
           Send Template <FontAwesomeIcon icon={faPaperPlane}/>
         </button>
         <button className="btn-cancel-add" onClick={handleCancel}>
-          Back
+          Cancel
         </button>
       </div>
     </div>
