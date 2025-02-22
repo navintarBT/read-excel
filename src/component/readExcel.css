@@ -800,231 +800,37 @@ padding-bottom: 5px;
     transform: translateY(-50%) translateX(-5px); 
 }
 
-/* @media (max-width: 1024px) {
-  nav {
-    padding: 0 10px;
-  }
-  .footer-copy {
-    padding: 0 10px;
-  }
-  h1 {
-    font-size: 2rem;
-    margin: 15px 0;
-  }
-  .amount-send h1{
-    font-size: 25px;
-  }
-  .amount-send h3{
-    font-size: 16px;
-  }
-
-  .btn-list{
-    height: 100px; 
-    font-size: 18px;
-    gap: 8px;
-  }
-
-  .send-btn {
-    font-size: 16px;
-    height: 45px;
-  }
-  .icon-circle {
-    width: 48px;
-    height: 48px;
-  }
-
-  .icon-add-message {
-    width: 25px;
-    height: 25px;
-    font-size: 12px;
-    margin: 5px;
-  }
-  
-  .icon-add-message svg {
-    color: white;
-    font-size: 17px;
-  }
-
-  .action-container button {
-    height: 35px; 
-    font-size: 14px;
-  }
-
-  .choice-send{
-    gap: 10px;
-    font-size: 12px;
-  }
-  .dropdown-phone-container label{
-    font-size: 12px;
-  }
-  .selected-phone-number label{
-    font-size: 12px;
-  }
-
-  .dropdown-select {
-    padding: 5px;
-    font-size: 14px;
-  }
-
-  .message-item-container {
-    height: 34%;
-  }
-  .select-phone button{
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-  }
-
-} */
-
-/* @media (min-resolution: 1.25dppx) { 
-  .header {
-    padding: 5px 10px  6px 10px;
-    font-size: 14px;
-  }
-  nav {
-    padding: 0 10px;
-  }
-
-  .footer {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .content{
-    display: flex;
-    padding: 0 0 2px 5px;
-    height: calc(100vh - 120px);
-    width: 100%;
-    box-sizing: border-box; 
-  }
-
-  table th, table td {
-    border: 10px solid #ddd;
-    text-align: left;
-  }
-  .amount-send h1{
+@media (min-resolution: 1.25dppx) { 
+  .select-choice h1{
     font-size: 30px;
-  }
-
-  .send-body-list{
-    margin-top: 5%;
-    display: flex;
-    justify-content: center;
-    height: 15%;
-    width: 100%;
-    gap: 7%;
-  }
-
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-  }
-  .icon-circle:hover::after {
-font-size: 10px;
-  }
-
-  .list-message{
-    gap: 40px;
-  }
-
-  .btn-list{
-    height: 100px; 
-    gap: 5px;
-    font-size: 20px;
-  }
-
-  .send-btn {
-
-    height: 40px;
-  }
-
-  .icon-add-message {
-    width: 25px;
-    height: 25px;
-    font-size: 5px;
-    margin: 5px;
-  }
-  
-  .icon-add-message svg {
-    color: white;
-    font-size: 15px;
-  }
-
-  .icon-add-message::after {
-    font-size: 12px
-}
-.action-container button {
-  height: 30px; 
-  font-size: 12px;
-}
-.message-item{
-  padding: 0;
-}
-
-.dropdown-phone-container label{
-  font-size: 13px;
-
-}
-
-.dropdown-select {
-  padding: 5px;
-  font-size: 12px;
-}
-
-.choice-send{
-  gap: 10px;
-  font-size: 12px;
-}
-
-.selected-phone-number label{
-  font-size: 12px;
-}
-
-.selected-phone-number {
-  padding: 0 10px 0 10px;
-}
-
-.message-item-container {
-  height: 35%;
-}
-
-.select-phone button{
-font-size: 12px;
-}
-
-.btn-add{
-  gap: 10px; 
-}
-.btn-add button{
-  height: 35px;
-}
-.send-head h1 {
-  font-size: 30px;
-}
-
-.textarea-container h2{
-  font-size: 20px;
-}
-.select-phone .control-checked{
-  width: 20px;
-
-}
-} */
-
-@media (min-resolution: 1.50dppx) { 
+    margin: 15px 0;
+    }
   .send-head h1 {
     font-size: 20px;
   }
+
+  .send-head{
+    height: 50px;
+  }
+  .table-container {
+    height: calc(105vh - 120px);
+    width: 100%;
+    box-sizing: border-box; 
+    background-color: #f5f5fa;
+  }
+  .messenger-whatsapp button{
+    color: white;
+    width: 150px;  
+    height: 220px; 
+    font-size: 22px;
+  }
   .header {
-    padding: 0 10px  6 10px;
+    padding: 0 10px  0 10px;
     font-size: 12px;
   }
   nav {
     padding: 0 10px;
+    height: 45px;
   }
 
   .footer {
@@ -1032,16 +838,22 @@ font-size: 12px;
     padding: 0;
     align-items: center;
     justify-content: center;
+    height: 45px;
   }
 
   .upload h2{
     color: black;
   }
 
+  .upload h1{
+    font-size: 35px;
+  }
+
+
   .content{
     display: flex;
     padding: 0 0 2px 5px;
-    height: calc(100vh - 120px);
+    height: calc(105vh - 120px);
     width: 100%;
     box-sizing: border-box; 
   }
@@ -1063,15 +875,199 @@ font-size: 12px;
     justify-content: center;
     height: 15%;
     width: 100%;
-    gap: 7%;
+    gap: 4%;
   }
 
   .icon-circle {
-    width: 35px;
-    height: 35px;
+    width: 33px;
+    height: 33px;
   }
   .icon-circle:hover::after {
+  font-size: 9px;
+  }
+
+  .list-message{
+    gap: 20px;
+    padding: 0 10px 10px 10px ;
+  }
+
+  .btn-list{
+    height: 80px; 
+    gap: 5px;
+    font-size: 18px;
+  }
+
+  .send-btn {
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .icon-add-message {
+    width: 20px;
+    height: 20px;
+    font-size: 2px;
+    margin: 3px;
+  }
+  
+  .icon-add-message svg {
+    color: white;
+    font-size: 13px;
+  }
+
+  .icon-add-message::after {
+    font-size: 10px
+}
+.action-container button {
+  height: 20px; 
   font-size: 10px;
+  padding: 0px;
+}
+
+.action-container{
+  padding: 1px 10px 1px 10px;
+}
+
+.message-item{
+  padding: 0;
+}
+
+.dropdown-phone-container label{
+  font-size: 10px;
+}
+
+.dropdown-select {
+  padding: 5px;
+  font-size: 10px;
+}
+
+.choice-send{
+  gap: 10px;
+  font-size: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected-phone-number label{
+  font-size: 10px;
+}
+
+.selected-phone-number {
+  padding: 0 10px 0 10px;
+}
+
+.message-item-container {
+  height: 23%;
+}
+
+.select-phone button{
+font-size: 9px;
+}
+
+.btn-add{
+  gap: 8px; 
+}
+.btn-add button{
+  height: 25px;
+  font-size: 12px;
+}
+.textarea-container h2{
+  font-size: 15px;
+}
+
+.send-body{
+  margin: 0;
+}
+
+.select-phone-control{
+  height: 75px;
+}
+
+}
+
+@media (min-resolution: 1.50dppx) { 
+  .select-choice h1{
+    font-size: 30px;
+    margin: 15px 0;
+    }
+  .send-head h1 {
+    font-size: 20px;
+  }
+
+  .send-head{
+    height: 50px;
+  }
+  .table-container {
+    height: calc(105vh - 120px);
+    width: 100%;
+    box-sizing: border-box; 
+    background-color: #f5f5fa;
+  }
+  .messenger-whatsapp button{
+    color: white;
+    width: 150px;  
+    height: 220px; 
+    font-size: 22px;
+  }
+  .header {
+    padding: 0 10px  0 10px;
+    font-size: 12px;
+  }
+  nav {
+    padding: 0 10px;
+    height: 45px;
+  }
+
+  .footer {
+    display: flex;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+  }
+
+  .upload h2{
+    color: black;
+  }
+
+  .upload h1{
+    font-size: 35px;
+  }
+
+
+  .content{
+    display: flex;
+    padding: 0 0 2px 5px;
+    height: calc(105vh - 120px);
+    width: 100%;
+    box-sizing: border-box; 
+  }
+
+  table th, table td {
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  .amount-send h2{
+    font-size: 20px;
+  }
+  .amount-send h3{
+    font-size: 15px;
+  }
+
+  .send-body-list{
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    height: 15%;
+    width: 100%;
+    gap: 4%;
+  }
+
+  .icon-circle {
+    width: 33px;
+    height: 33px;
+  }
+  .icon-circle:hover::after {
+  font-size: 9px;
   }
 
   .list-message{
