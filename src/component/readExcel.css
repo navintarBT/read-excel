@@ -802,18 +802,15 @@ padding-bottom: 5px;
 
 @media (min-resolution: 1.25dppx) { 
   .select-choice h1{
-    font-size: 30px;
+    font-size: 35px;
     margin: 15px 0;
     }
-  .send-head h1 {
-    font-size: 20px;
-  }
 
   .send-head{
-    height: 50px;
+    height: 70px;
   }
   .table-container {
-    height: calc(105vh - 120px);
+    height: calc(102vh - 120px);
     width: 100%;
     box-sizing: border-box; 
     background-color: #f5f5fa;
@@ -826,11 +823,11 @@ padding-bottom: 5px;
   }
   .header {
     padding: 0 10px  0 10px;
-    font-size: 12px;
+    font-size: 16px;
   }
   nav {
     padding: 0 10px;
-    height: 45px;
+    height: 55px;
   }
 
   .footer {
@@ -838,7 +835,8 @@ padding-bottom: 5px;
     padding: 0;
     align-items: center;
     justify-content: center;
-    height: 45px;
+    height: 55px;
+    font-size: 16px;
   }
 
   .upload h2{
@@ -853,7 +851,7 @@ padding-bottom: 5px;
   .content{
     display: flex;
     padding: 0 0 2px 5px;
-    height: calc(105vh - 120px);
+    height: calc(101vh - 120px);
     width: 100%;
     box-sizing: border-box; 
   }
@@ -863,14 +861,14 @@ padding-bottom: 5px;
     text-align: left;
   }
   .amount-send h2{
-    font-size: 20px;
+    font-size: 25px;
   }
   .amount-send h3{
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .send-body-list{
-    margin-top: 0;
+    margin-top: 15px;
     display: flex;
     justify-content: center;
     height: 15%;
@@ -879,11 +877,11 @@ padding-bottom: 5px;
   }
 
   .icon-circle {
-    width: 33px;
-    height: 33px;
+    width: 38px;
+    height: 38px;
   }
   .icon-circle:hover::after {
-  font-size: 9px;
+  font-size: 14px;
   }
 
   .list-message{
@@ -892,7 +890,7 @@ padding-bottom: 5px;
   }
 
   .btn-list{
-    height: 80px; 
+    height: 100px; 
     gap: 5px;
     font-size: 18px;
   }
@@ -903,28 +901,28 @@ padding-bottom: 5px;
   }
 
   .icon-add-message {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     font-size: 2px;
-    margin: 3px;
+    margin: 5px;
   }
   
   .icon-add-message svg {
     color: white;
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .icon-add-message::after {
     font-size: 10px
 }
 .action-container button {
-  height: 20px; 
-  font-size: 10px;
-  padding: 0px;
+  height: 28px; 
+  font-size: 14px;
+  padding: 10px;
 }
 
 .action-container{
-  padding: 1px 10px 1px 10px;
+  padding: 3px 10px 3px 10px;
 }
 
 .message-item{
@@ -932,23 +930,23 @@ padding-bottom: 5px;
 }
 
 .dropdown-phone-container label{
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .dropdown-select {
-  padding: 5px;
-  font-size: 10px;
+  padding: 8px;
+  font-size: 14px;
 }
 
 .choice-send{
-  gap: 10px;
-  font-size: 10px;
+  gap: 12px;
+  font-size: 14px;
   align-items: center;
   justify-content: center;
 }
 
 .selected-phone-number label{
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .selected-phone-number {
@@ -960,15 +958,15 @@ padding-bottom: 5px;
 }
 
 .select-phone button{
-font-size: 9px;
+font-size: 14px;
 }
 
 .btn-add{
-  gap: 8px; 
+  gap: 10px; 
 }
 .btn-add button{
-  height: 25px;
-  font-size: 12px;
+  height: 35px;
+  font-size: 16px;
 }
 .textarea-container h2{
   font-size: 15px;
@@ -989,10 +987,6 @@ font-size: 9px;
     font-size: 30px;
     margin: 15px 0;
     }
-  .send-head h1 {
-    font-size: 20px;
-  }
-
   .send-head{
     height: 50px;
   }
@@ -1144,7 +1138,7 @@ font-size: 9px;
 }
 
 .select-phone button{
-font-size: 9px;
+font-size: 10px;
 }
 
 .btn-add{
