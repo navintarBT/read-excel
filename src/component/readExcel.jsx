@@ -51,14 +51,14 @@ const ReadExcel = () => {
   }
 
   const handleFileUpload = (file) => {
-    const validExtensions = ['xlsx', 'xls', 'csv'];
+    const validExtensions = ['xlsx', 'xls'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
 
   if (!validExtensions.includes(fileExtension)) {
     Swal.fire({
       icon: 'error',
       title: 'Invalid File Type',
-      text: 'Please upload a valid Excel file.',
+      text: 'Please upload a Excel file.',
     });
     return;
   }
@@ -66,7 +66,7 @@ const ReadExcel = () => {
     if(optionSend == true){
       setShowSendMessage(false);
       if(addFromMessenger == 'addFromMessenger'){
-      setShowPageInitial(false)
+      setShowPageInitial(true)
     }else{
       setShowPageInitial(true)
       }
@@ -92,10 +92,19 @@ const ReadExcel = () => {
     setPhoneNumberEmpty([]);
     reader.onload = (e) => {
       const binaryStr = e.target.result;
-      const workbook = XLSX.read(binaryStr, { type: 'binary' });
+      const workbook = XLSX.read(binaryStr, { type: 'binary', cellDates: true });
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      console.log(jsonData);
+
+      // Loop through rows and cells to check types
+      jsonData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          console.log(`Row ${rowIndex + 1}, Column ${colIndex + 1}:`, cell, 'Type:', typeof cell);
+        });
+      });
+
       let headerRowIndex = -1;
       for (let i = 0; i < jsonData.length; i++) {
         const row = jsonData[i];
@@ -229,6 +238,7 @@ const ReadExcel = () => {
     setShowListMessage(false);
     setShowListTemplate(false);
     setShowSendMessenger(false);
+    setDatapage(null)
   }
 
   const handleToggleTemplate = (e) => {
@@ -460,7 +470,7 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
 
   const fetchPromises = ids.map(({ id, index }) => {
     var urlencoded = new URLSearchParams();
-    urlencoded.append("token", "uwetp05gfbbjkc2g");
+    urlencoded.append("token", "98o1ib90jhvrmm38");
     urlencoded.append("page", "1");
     urlencoded.append("limit", "10");
     urlencoded.append("status", "all");
@@ -480,7 +490,7 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
       redirect: 'follow'
     };
 
-    return fetch("https://api.ultramsg.com/instance104874/messages?" + urlencoded, requestOptions)
+    return fetch("https://api.ultramsg.com/instance108372/messages?" + urlencoded, requestOptions)
       .then(response => response.json())
       .then(result => {
         if (result.messages[0].status === "invalid") {
@@ -552,10 +562,22 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
             const isEmptyRow = phoneNumberEmpty?.includes(index) || false;
             const isInvalid = invalidPhoneNumbers.some(item => item.phoneNumber === phoneNumber && item.index === index);
             return (
-              <tr key={index} className={`${isInvalid ? 'invalid-phone' : ''} ${isEmptyRow ? 'empty-phone' : ''}`}>
-                {headers.map((header, i) => (
-                  <td key={i}>{row[header]}</td>
-                ))}
+              <tr 
+                key={index} 
+                className={`${isInvalid ? 'invalid-phone' : ''} ${isEmptyRow ? 'empty-phone' : ''}`}
+              >
+                {/* {11111} */}
+                {headers.map((header, i) => {
+                  const cellData = row[header];
+                  const displayValue = cellData instanceof Date 
+                    ? cellData.toLocaleDateString()  
+                    : cellData;
+                  return (
+                    <td key={i}>
+                      {displayValue}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
@@ -626,6 +648,7 @@ const checkPhoneInvalid = async (ids, indexColumn, emptyIndexes) => {
           onToggleCancel ={handleToggleCancelCreatePage} 
           messengerToEdit={messengerToEdit}
           clearToEdit={clearToEdit}
+          dataPage={dataPage}
           />}
            {showListMessage && 
           <MessageList
@@ -781,7 +804,7 @@ const SendMessageSection = ({onClick, fileInputRef, onFileUpload, onToggleMessag
        Message List <FontAwesomeIcon icon={faUpload} />
     </button>
     <button className="send-btn" onClick ={() =>handleToggleBackHome(true)}>
-        <FontAwesomeIcon icon={faArrowLeft}  />Back To Home
+        <FontAwesomeIcon icon={faArrowLeft}  />Cancel
         </button>
       </div>
       <div className="send-footer">
@@ -989,7 +1012,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   });
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
-  const [selectedData, setSelectedData] = useState(null);
+  const [selectedData, setSelectedData] = useState([]);
   const [sendMessage, setSendMessage] = useState(null);
   const [indexCol, setIndexCol] = useState(null);
   const [showRadio, setShowRadio] = useState(false);
@@ -998,7 +1021,8 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
 
   const handleSave = async () => {
-    if (!sendMessage || !selectedData) {
+    console.log(selectedData);
+    if (!sendMessage || selectedData.length <= 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
@@ -1028,7 +1052,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
+        urlencoded.append("token", "98o1ib90jhvrmm38");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${sendMessage}`);
         var requestOptions = {
@@ -1038,7 +1062,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance108372/messages/chat", requestOptions)
           .then(response => response.json())
           .then((result) => {
             if (result.error) {
@@ -1126,7 +1150,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
           text: 'Select the phone number column, please.',
         });
         setShowRadio(false);
-        setSelectedData("");
+        setSelectedData([]);
         return;
       }else{
       selectedData = selectedData.map(value => (value.toString().length === 8 ? value : ""));
@@ -1137,7 +1161,7 @@ const MessageList = ({ onToggleMessageList, onEditMessage,headers,data,SpinnerCo
     }
     if (selectedIndex === "") {
       setShowRadio(false);
-      setSelectedData("");
+      setSelectedData([]);
     }
   };
 
@@ -1269,7 +1293,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   });
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedOption, setSelectedOption] = useState('');
-  const [selectedData, setSelectedData] = useState(null);
+  const [selectedData, setSelectedData] = useState([]);
   const [sendTemplate, setSendTemplate] = useState(null);
   const [indexCol, setIndexCol] = useState(null);
   const [showRadio, setShowRadio] = useState(false);
@@ -1277,7 +1301,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState([]);
   const handleSave = async () => {
-    if (!sendTemplate || !selectedData) {
+    if (!sendTemplate || selectedData.length <= 0) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
@@ -1309,7 +1333,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         var urlencoded = new URLSearchParams();
-        urlencoded.append("token", "uwetp05gfbbjkc2g");
+        urlencoded.append("token", "98o1ib90jhvrmm38");
         urlencoded.append("to", `+85620${dataItem}`);
         urlencoded.append("body", `${template}`);
         var requestOptions = {
@@ -1319,7 +1343,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           redirect: 'follow'
         };
 
-        return fetch("https://api.ultramsg.com/instance104874/messages/chat", requestOptions)
+        return fetch("https://api.ultramsg.com/instance108372/messages/chat", requestOptions)
           .then(response => response.json())
           .then(result => {
             if (result.error) {
@@ -1381,8 +1405,12 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     templateValue = templateValue.replace(/{{{+/g, '{{').replace(/}}}+/g, '}}');
     const regex = /{{\s*([a-zA-Z0-9_ก-๙ກ-ໝ\s]+)\s*}}/g;
     const updatedTemplates = data.map((row) => {
-      return templateValue.replace(regex, (match, key) => {
+      return templateValue.replace(regex, (_, key) => {
         key = key.trim();
+        const cellValue = row[key];
+      if (cellValue instanceof Date) {
+        return cellValue.toLocaleDateString();
+      }
         return row[key] !== undefined ? row[key] : '';
       });
     });
@@ -1417,7 +1445,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           text: 'Select the phone number column, please.',
         });
         setShowRadio(false);
-        setSelectedData("");
+        setSelectedData([]);
         return;
       }else{
       selectedData = selectedData.map(value => (value.toString().length === 8 ? value : ""));
@@ -1428,7 +1456,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
     }
     if (selectedIndex === "") {
       setShowRadio(false);
-      setSelectedData("");
+      setSelectedData([]);
     }
   };
 
@@ -1549,7 +1577,7 @@ const TemplateList = ({ onToggleTemplateList,onEditTemplate,headers,data,Spinner
           Send Template <FontAwesomeIcon icon={faPaperPlane}/>
         </button>
         <button className="btn-cancel-add" onClick={handleCancel}>
-          cancel
+          Cancel
         </button>
       </div>
     </div>
@@ -1636,7 +1664,7 @@ const PageInitial = ({handleToggleBackHome,handleEditMessenger,onToggleMessage,h
       </div>
       <div className='btn-add'>
         <button className='btn-save-add' onClick={handleSave}>Confirm Page<FontAwesomeIcon icon={faPaperPlane}/></button>
-        <button className='btn-cancel-add' onClick={()=>handleToggleBackHome(true)}>Back</button>
+        <button className='btn-cancel-add' onClick={()=>handleToggleBackHome(true)}>Cancel</button>
       </div>
     </div>
   );
@@ -1646,7 +1674,7 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
     <div className="send-message">
       <div className="send-head">
       <div className='amount-send'>
-        <h2>Messenger</h2>
+        <h2>Messenger</h2> 
         <h3>Send message by use messenger</h3>
         </div>
       </div>
@@ -1679,7 +1707,7 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
        Message List <FontAwesomeIcon icon={faUpload} />
     </button>
     <button className="send-btn" onClick ={()=>handleToggleBackPageInitial()}>
-        <FontAwesomeIcon icon={faArrowLeft}  />Back 
+        <FontAwesomeIcon icon={faArrowLeft}  />Cancel
         </button>
       </div>
       <div className="send-footer">
@@ -1687,7 +1715,8 @@ const MessengerDetail = ({onClick, fileInputRef, onFileUpload, onToggleMessage, 
     </div>
 );
 
-const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearToEdit}) => { 
+const CreatePromptPage = ({onToggleSave,onToggleCancel,messengerToEdit,clearToEdit,dataPage}) => { 
+  console.log(dataPage);
   const [pageName, setPageName] = useState(messengerToEdit? messengerToEdit.name : '');
   const [pageId, setPageId] = useState(messengerToEdit? messengerToEdit.pageId : '');
   const [accessToken, setAccessToken] = useState(messengerToEdit? messengerToEdit.accessToken : '');
@@ -1734,7 +1763,11 @@ const handleSave = () => {
 };
 
   const handleCancel = () => {
-    messengerToEdit? onToggleSave() :onToggleCancel();
+    if(dataPage){
+    messengerToEdit? onToggleSave() :onToggleCancel()
+    }else{
+        onToggleSave() 
+    }
     clearToEdit("clear-messenger");
   };
   return(
@@ -2209,8 +2242,12 @@ const MessengerTemplateList = ({ onToggleTemplateList,onEditTemplate,headers,dat
     templateValue = templateValue.replace(/{{{+/g, '{{').replace(/}}}+/g, '}}');
     const regex = /{{\s*([a-zA-Z0-9_ก-๙ກ-ໝ\s]+)\s*}}/g;
     const updatedTemplates = data.map((row) => {
-      return templateValue.replace(regex, (match, key) => {
+      return templateValue.replace(regex, (_, key) => {
         key = key.trim();
+        const cellValue = row[key];
+      if (cellValue instanceof Date) {
+        return cellValue.toLocaleDateString();
+      }
         return row[key] !== undefined ? row[key] : '';
       });
     });
